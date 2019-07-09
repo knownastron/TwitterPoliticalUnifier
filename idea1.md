@@ -3,8 +3,9 @@ I want to build a website that will aggregate links to videos hosted on other pl
 
 The use case of my website will be to reduce the dependency on a single video hosting platform which has increasingly become a concern for both creators and users. When users want to watch a video, they will visit my website and get links to the videos from all the top hosting sites. They can choose to patron which ever website they wish from the list of links.
 
-This will be initially a crowd sourced type of system. Users can post links to a video and be upvoted/downvoted based on their relevance or quality.
+This will be initially a crowd sourced type of system. Users can post links to a video and be upvoted/downvoted based on their relevance or quality. The other way I can take this is to do a meta-search engine like you see here https://torrentz2.eu/
 
+Open to suggestions.
 
 **project milestones**
 
