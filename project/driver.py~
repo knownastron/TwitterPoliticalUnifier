@@ -1,0 +1,15 @@
+import twitter_functions as tf
+import neo4j_functions as n4j
+
+def get_username_and_tweet_id(url):
+    split_url = url.split('/')
+    index_of_twitter = split_url.index('twitter.com')
+    username = format.format_username(split_url[index_of_twitter + 1])
+    tweet_id = split_url[index_of_twitter + 3]
+    return username, tweet_id
+
+username, tweet_id = get_username_and_tweet_id('https://twitter.com/AOC/status/1151868495824642049')
+twit_conn = tf.TwitterConnection()
+
+liked_list = twit_conn.get_liked_list(tweet_id)
+print(liked_list)
