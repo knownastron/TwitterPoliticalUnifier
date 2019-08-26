@@ -1,0 +1,24 @@
+#create constraint on unique usernames
+CREATE CONSTRAINT ON (user:User) ASSERT user.Username IS UNIQUE
+
+
+# create users if they don't exist, create relationships between users if they don't exist 
+MERGE (u1:User {Username:"@knownastron"})
+MERGE (u2:User {Username:"@realDonaldTrump"})
+MERGE (u1)-[r:LIKED]->(u2)
+return r
+
+# delete all nodes with no labels
+MATCH (n)
+WHERE size(labels(n)) = 0
+DELETE n
+
+# delete all nodes with no relationships
+MATCH (n)
+WHERE size((n)--())=0
+DELETE (n)
+
+#delete a node with username and all it's relationships
+MATCH (user:User {Username:"@marchandsteve"})
+OPTIONAL MATCH (user)-[r]-() 
+DELETE user, r
