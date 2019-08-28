@@ -364,6 +364,6 @@ local.properties
 # *.ipr
 
 # Jason's ignores
-twitter_credentials.py
-twitter_credentials.py~
+credentials.py
+credentials.py~
 idea.md
