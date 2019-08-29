@@ -64,13 +64,31 @@ class TwitterConnection:
 
         return tweet_texts
 
+    def get_following(self, username, num_followers, print_progress=False):
+        """
+        Get list of usernames of users followed by param username
+        :param username: username in the form of '@name'
+        :param num_followers: umber of followers to return
+        :param print_progress: True/False for printing progress
+        :return: a list of usernames formatted to include '@'
+        """
+        friend_list = []
+        count = 0
+        for user in Cursor(self.api.friends, screen_name=username).items(num_followers):
+            cur_following = format.format_username(user.screen_name)
+            friend_list.append(cur_following)
+            if print_progress:
+                print('get_follower', count, cur_following)
+                count += 1
+        return friend_list
+
     def get_followers(self, username, num_followers, print_progress=False):
         """
-        Get list of follower's usernames
+        Get list of usernames of users that are following param username
         :param username: username in the form of '@name'
         :param num_followers: number of followers to return
-        :param print_progress: print progress
-        :return:
+        :param print_progress: True/False for print progress
+        :return: a list of usernames formatted to include '@'
         """
         follower_list = []
         count = 1
@@ -84,10 +102,10 @@ class TwitterConnection:
 
     def get_liked_list(self, tweet_id):
         """
-        Returns the list of screen_names of users who liked the param tweet_id
+        Returns the list of usernames of users who liked the param tweet_id
 
-        :param tweet_id:
-        :return:
+        :param tweet_id: a tweet id as defined by twitter
+        :return:a list of usernames formatted to include '@'
         """
         # get the data of likers
         r = requests.get('https://twitter.com/i/activity/favorited_popup?id=' + tweet_id)
