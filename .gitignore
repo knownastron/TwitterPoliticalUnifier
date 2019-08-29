@@ -366,6 +366,10 @@ local.properties
 # Jason's ignores
 credentials.py
 credentials.py~
+twitter_credentials.py
+twitter_credentials.py~
+neo4j_credentials.py
+neo4j_credentials.py~
 idea.md
 __pycache__/
 *.pyc
