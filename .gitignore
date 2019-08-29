@@ -367,3 +367,5 @@ local.properties
 credentials.py
 credentials.py~
 idea.md
+__pycache__/
+*.pyc
