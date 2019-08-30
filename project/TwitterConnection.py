@@ -74,7 +74,7 @@ class TwitterConnection:
         """
         friend_list = []
         count = 0
-        for user in Cursor(self.api.friends, screen_name=username).items(num_followers):
+        for user in limit_handled(Cursor(self.api.friends, screen_name=username).items(num_followers)):
             cur_following = format.format_username(user.screen_name)
             friend_list.append(cur_following)
             if print_progress:
