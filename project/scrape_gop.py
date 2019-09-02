@@ -20,7 +20,7 @@ class DatabaseConnection():
         """
         info: 
         """
-        sql = ''' INSERT INTO Users(ScreenName, UserId, PolLabel)
+        sql = ''' INSERT OR IGNORE INTO Users(ScreenName, UserId, PolLabel)
               VALUES(?,?,?) '''
         cur = self.conn.cursor()
         cur.execute(sql, info)
@@ -28,7 +28,7 @@ class DatabaseConnection():
     def close(self):
         self.conn.close()
 
-def limit_handled(
+def limit_handled(cursor):
     """
     Handles Twitter API's RateLimitError and StopIteration for Cursor
     :param cursor: Tweepy Cursor object
@@ -46,7 +46,7 @@ def limit_handled(
 
 def write_followers(username):
     count = 0
-    for follower in limit_handled(Cursor(api.followers, screen_name=username).items(6)):
+    for follower in limit_handled(Cursor(api.followers, screen_name=username).items()):
         if follower.protected == False:
             info = (follower.screen_name.lower(), follower.id_str, 'conservative')
             db_connect.write_conservative(info)
