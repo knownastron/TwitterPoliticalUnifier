@@ -20,8 +20,8 @@ class DatabaseConnection():
         """
         info: 
         """
-        sql = ''' INSERT OR IGNORE INTO Users(ScreenName, UserId, PolLabel)
-              VALUES(?,?,?) '''
+        sql = ''' INSERT OR IGNORE INTO Test(ScreenName, UserId, UserIdStr, PolLabel)
+              VALUES(?,?,?, ?) '''
         cur = self.conn.cursor()
         cur.execute(sql, info)
         self.conn.commit()
@@ -48,7 +48,7 @@ def write_followers(username):
     count = 0
     for follower in limit_handled(Cursor(api.followers, screen_name=username).items()):
         if follower.protected == False:
-            info = (follower.screen_name.lower(), follower.id_str, 'liberal')
+            info = (follower.screen_name.lower(), follower.id, follower.id_str, 'liberal')
             db_connect.write_liberal(info)
             print(count, info[0:2])
             count += 1
@@ -57,5 +57,5 @@ if __name__ == '__main__':
     conservative_db = 'liberals.db'
     db_connect = DatabaseConnection(conservative_db)
 
-write_followers('TheDemocrats')
+write_followers('jaredbrunet')
 db_connect.close()
