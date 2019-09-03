@@ -138,7 +138,7 @@ class TwitterSearch(object):
             date_span = li.find("span", class_="_timestamp")
             if date_span is not None:
                 t = datetime.datetime.fromtimestamp((float(date_span['data-time-ms'])/1000))
-                fmt = "%d-%m-%Y %H:%M:%S"
+                fmt = "%Y-%m-%d %H:%M:%S"
                 tweet['created_at'] = t.strftime(fmt)
 
             # Tweet Retweets
@@ -211,6 +211,11 @@ class TwitterSearchImpl(TwitterSearch):
 #                log.info("%i [%s] - %s" % (self.counter, tweet['created_at'], tweet['text']))
                 self.saved_tweets.append(tweet)
                 print(self.counter)
+                print('tweet_id', tweet['tweet_id'])
+                print('user_id', tweet['user_id'])
+                print('created_at', tweet['created_at'])
+                print('user_name', tweet['user_name'])
+                print('text\n\n\n')
 
             # When we've reached our max limit, return False so collection stops
             if self.max_tweets is not None and self.counter >= self.max_tweets:
@@ -291,3 +296,4 @@ if __name__ == '__main__':
 #    print("TwitterSearch collected %i" % twit.counter)
 #xprint("TwitterSlicer collected %i" % twitSlice.counter)
 
+B
