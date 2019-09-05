@@ -44,6 +44,8 @@ class TwitterConnection:
         self.auth.set_access_token(twitter_credentials.ACCESS_TOKEN, twitter_credentials.ACCESS_TOKEN_SECRET)
         self.api = API(self.auth)
 
+
+
     def get_text_of_tweet(self, username, num_tweets, print_progress=False):
         """
         Gets all the texts of a tweet:
@@ -134,6 +136,11 @@ class TwitterConnection:
                 print('username_of_tweets_liked_by', count, cur_user)
                 count += 1
         return usernames
+
+    def get_user_ids(self, usernames):
+        user_objects = self.api.lookup_users(screen_names=usernames)
+        user_ids = [(user.screen_name, user.id_str) for user in user_objects]
+        return user_ids
 
     def get_all_rate_limit_status(self):
         return self.api.rate_limit_status()
