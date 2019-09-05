@@ -46,7 +46,6 @@ class TwitterSearch(object):
         min_tweet = None
         response = self.execute_search(url)
         while response is not None and continue_search and response['items_html'] is not None:
-            print('OK')
             tweets = self.parse_tweets(response['items_html'])
 
             # If we have no tweets, then we can break the loop early
@@ -131,7 +130,7 @@ class TwitterSearch(object):
             user_details_div = li.find("div", class_="tweet")
             if user_details_div is not None:
                 tweet['user_id'] = user_details_div['data-user-id']
-                tweet['user_screen_name'] = user_details_div['data-user-id']
+                tweet['user_screen_name'] = user_details_div['data-screen-name']
                 tweet['user_name'] = user_details_div['data-name']
 
             # Tweet date
@@ -210,18 +209,28 @@ class TwitterSearchImpl(TwitterSearch):
             if tweet['created_at'] is not None:
 #                log.info("%i [%s] - %s" % (self.counter, tweet['created_at'], tweet['text']))
                 self.saved_tweets.append(tweet)
-                print(self.counter)
-                print('tweet_id', tweet['tweet_id'])
-                print('user_id', tweet['user_id'])
-                print('created_at', tweet['created_at'])
-                print('user_name', tweet['user_name'])
-                print('text\n\n\n')
+                # print(self.counter)
+                # print('tweet_id', tweet['tweet_id'])
+                # print('user_id', tweet['user_id'])
+                # print('created_at', tweet['created_at'])
+                # print('user_name', tweet['user_name'])
+                # print('text\n\n\n')
 
             # When we've reached our max limit, return False so collection stops
             if self.max_tweets is not None and self.counter >= self.max_tweets:
                 return False
 
         return True
+
+    def get_tweets(self):
+        return self.saved_tweets
+
+    def get_num_tweets(self):
+        return len(self.saved_tweets)
+
+    def clear_tweets(self):
+        self.saved_tweets = []
+        self.counter = 0
 
 
 class TwitterSlicer(TwitterSearch):
@@ -237,6 +246,7 @@ class TwitterSlicer(TwitterSearch):
         self.until = until
         self.n_threads = n_threads
         self.counter = 0
+        self.saved_tweets = []
 
     def search(self, query):
         n_days = (self.until - self.since).days
@@ -258,12 +268,69 @@ class TwitterSlicer(TwitterSearch):
             # Lets add a counter so we only collect a max number of tweets
             self.counter += 1
             if tweet['created_at'] is not None:
-                t = datetime.datetime.fromtimestamp((tweet['created_at']/1000))
-                fmt = "%Y-%m-%d %H:%M:%S"
-                log.info("%i [%s] - %s" % (self.counter, t.strftime(fmt), tweet['text']))
-
+                # print(self.counter)
+                # print('tweet_id', tweet['tweet_id'])
+                # print('user_id', tweet['user_id'])
+                # print('created_at', tweet['created_at'])
+                # print('user_name', tweet['user_name'])
+                # print(tweet['text'])
+                # t = datetime.datetime.fromtimestamp((tweet['created_at']/1000))
+                # fmt = "%Y-%m-%d %H:%M:%S"
+                # log.info("%i [%s] - %s" % (self.counter, t.strftime(fmt), tweet['text']))
+                self.saved_tweets.append(tweet)
         return True
 
+    def get_tweets(self):
+        return self.saved_tweets
+
+    def clear_tweets(self):
+        self.saved_tweets = []
+
+'''
+if __name__ == '__main__':
+    log.basicConfig(level=log.INFO)
+
+    search_query = "from:realDonaldTrump"
+    rate_delay_seconds = 0
+    error_delay_seconds = 5
+
+
+    # Example of using TwitterSearch
+    twit = TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, 20)
+    twit.search(search_query)
+
+    tweets = twit.get_tweets()
+
+    print(tweets[0].keys())
+    for tweet in tweets:
+        print(tweet, '\n')
+    print('---------------')
+    print('---------------')
+    print('---------------')
+
+
+    for i, tweet in enumerate(twit.saved_tweets):
+        print(i, '---', tweet)
+
+
+
+    # Example of using TwitterSlice
+    select_tweets_since = datetime.datetime.strptime("2019-08-01", '%Y-%m-%d')
+    select_tweets_until = datetime.datetime.strptime("2019-09-04", '%Y-%m-%d')
+    threads = 10
+
+    twitSlice = TwitterSlicer(rate_delay_seconds, error_delay_seconds, select_tweets_since, select_tweets_until,
+                              threads)
+    twitSlice.search(search_query)
+
+    tweets = twitSlice.get_tweets()
+    print(len(tweets))
+    for tweet in tweets:
+        print(tweet, '\n')
+
+#    print("TwitterSearch collected %i" % twit.counter)
+#xprint("TwitterSlicer collected %i" % twitSlice.counter)
+'''
 
 if __name__ == '__main__':
     log.basicConfig(level=log.INFO)
@@ -273,27 +340,21 @@ if __name__ == '__main__':
     error_delay_seconds = 5
 
     # Example of using TwitterSearch
-    twit = TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, 1000)
-    twit.search(search_query)
-    print('---------------')
-    print('---------------')
-    print('---------------')
-    '''
-    print(len(twit.saved_tweets))
-    for i, tweet in enumerate(twit.saved_tweets):
-        print(i, '---', tweet)
-    
-    
+    # twit = TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, 10)
+    # twit.search(search_query)
+
     # Example of using TwitterSlice
-    select_tweets_since = datetime.datetime.strptime("2016-10-01", '%Y-%m-%d')
-    select_tweets_until = datetime.datetime.strptime("2016-12-01", '%Y-%m-%d')
+    select_tweets_since = datetime.datetime.strptime("2019-08-01", '%Y-%m-%d')
+    select_tweets_until = datetime.datetime.strptime("2019-08-02", '%Y-%m-%d')
     threads = 10
 
     twitSlice = TwitterSlicer(rate_delay_seconds, error_delay_seconds, select_tweets_since, select_tweets_until,
                               threads)
     twitSlice.search(search_query)
-    '''
-#    print("TwitterSearch collected %i" % twit.counter)
-#xprint("TwitterSlicer collected %i" % twitSlice.counter)
+    tweets = twitSlice.get_tweets()
 
-B
+    for tweet in tweets:
+        print(tweet)
+
+    #print("TwitterSearch collected %i" % twit.counter)
+    print("TwitterSlicer collected %i" % twitSlice.counter)
