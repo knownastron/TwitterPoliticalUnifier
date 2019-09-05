@@ -366,6 +366,8 @@ local.properties
 # Jason's ignores
 credentials.py
 credentials.py~
+credentials1.py
+credentials1.py~
 twitter_credentials.py
 twitter_credentials.py~
 neo4j_credentials.py
