@@ -1,4 +1,0 @@
-def formatText(text):
-    text = text.replace("\n", " ")
-
-    return text
