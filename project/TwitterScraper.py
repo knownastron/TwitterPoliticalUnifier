@@ -335,15 +335,17 @@ if __name__ == '__main__':
 if __name__ == '__main__':
     log.basicConfig(level=log.INFO)
 
-    search_query = "from:realDonaldTrump"
+    search_query = "from:johnregehr"
     rate_delay_seconds = 0
     error_delay_seconds = 5
 
-    # Example of using TwitterSearch
-    # twit = TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, 10)
-    # twit.search(search_query)
+#    Example of using TwitterSearch
+    twit = TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, None)
+    twit.search(search_query)
+    tweets = twit.get_tweets()
 
     # Example of using TwitterSlice
+    '''
     select_tweets_since = datetime.datetime.strptime("2019-08-01", '%Y-%m-%d')
     select_tweets_until = datetime.datetime.strptime("2019-08-02", '%Y-%m-%d')
     threads = 10
@@ -352,9 +354,9 @@ if __name__ == '__main__':
                               threads)
     twitSlice.search(search_query)
     tweets = twitSlice.get_tweets()
-
+    '''
     for tweet in tweets:
         print(tweet)
 
-    #print("TwitterSearch collected %i" % twit.counter)
-    print("TwitterSlicer collected %i" % twitSlice.counter)
+    print("TwitterSearch collected %i" % twit.counter)
+    #print("TwitterSlicer collected %i" % twitSlice.counter)
