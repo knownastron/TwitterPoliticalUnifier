@@ -36,3 +36,6 @@ def remove_hashtags(text):
 
 def remove_mentions(text):
     return re.sub(r"@\S+", "", text)
+
+def remove_picture_links(text):
+    return re.sub(r"pic.twitter.com\S+", "", text)
