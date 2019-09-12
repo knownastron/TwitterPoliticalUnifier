@@ -18,9 +18,8 @@ class DatabaseConnection():
         """
         Requires 4 items for info, use None if it doesn't exist
         """
-        print(info)
         sql = ''' INSERT OR IGNORE INTO Users(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict)
-              VALUES(?,?,?,?, ?) '''
+              VALUES(?,?,?,?,?) '''
         cur = self.conn.cursor()
         cur.execute(sql, info)
         self.conn.commit()
@@ -32,6 +31,20 @@ class DatabaseConnection():
         cur.execute(sql, info)
         self.conn.commit()
 
+
+    def query_all_tweets(self, screen_name):
+        sql = "SELECT * FROM Tweets WHERE ScreenName=?"
+        cur = self.conn.cursor()
+        cur.execute(sql, screen_name)
+        tweets = cur.fetchall()
+        return tweets
+
+    def query_all_tweets_limit(self, screen_name, limit):
+        sql = "SELECT * FROM Tweets WHERE ScreenName=? limit ?"
+        cur = self.conn.cursor()
+        cur.execute(sql, (screen_name, limit))
+        tweets = cur.fetchall()
+        return tweets
 
 
     def close(self):
