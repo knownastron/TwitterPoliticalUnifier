@@ -370,6 +370,8 @@ credentials1.py
 credentials1.py~
 twitter_credentials.py
 twitter_credentials.py~
+twitter_credentials1.py
+twitter_credentials1.py~
 neo4j_credentials.py
 neo4j_credentials.py~
 idea.md
