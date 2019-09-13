@@ -1,10 +1,13 @@
 import sqlite3
+import pymysql
+from format import format_tweet_text
 
 class SQLConnection():
     def __init__(self, conn):
         self.conn = conn;
 
-    def write_new_user(self, info):
+        
+    def write_new_user(self, ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict):
         """
         Requires 4 items for info, use None if it doesn't exist
         """
@@ -14,11 +17,11 @@ class SQLConnection():
         cur.execute(sql, info)
         self.conn.commit()
 
-    def write_tweet(self, info):
+    def write_tweet(self, TweetId, Text, ScreenName, Date):
         sql = ''' INSERT OR IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
               VALUES(?,?,?,?) '''
         cur = self.conn.cursor()
-        cur.execute(sql, info)
+        cur.execute(sql, (TweetId, Text, ScreenName, Date))
         self.conn.commit()
 
 
@@ -36,17 +39,62 @@ class SQLConnection():
         tweets = cur.fetchall()
         return tweets
 
-
     def close(self):
         self.conn.close()
 
 class LocalConnection(SQLConnection):
     def __init__(self, database_name):
-        conn = sqlite3.connect(database_name)
-        super(LocalConnection, self).__init__(conn)
+        self.conn = sqlite3.connect(database_name)
+        super(LocalConnection, self).__init__(self.conn)
 
-'''        
-class AWSConnection(SQLConnection):
-    def __init__(self, database_name):
-        pass
-'''
+
+class AWSConnection():
+    def __init__(self, host, port, dbname, user, password):
+        self.conn = pymysql.connect(host, user=user, port=port, passwd=password, db=dbname)
+        
+    def write_new_user(self, ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict):
+        """
+        Requires 4 items for info, use None if it doesn't exist
+        """
+        sql = ''' INSERT IGNORE INTO Users(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict)
+              VALUES(%s, %s, %s, %s, %s) '''
+        cur = self.conn.cursor()
+        cur.execute(sql, (ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict))
+        self.conn.commit()
+
+    def write_tweet(self, TweetId, Text, ScreenName, Date):
+        sql = ''' INSERT IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
+              VALUES(%s, %s, %s, %s)'''
+        cur = self.conn.cursor()
+        cur.execute(sql, (TweetId, Text, ScreenName, Date))
+        self.conn.commit()
+
+    def write_tweets(self, tweets):
+        sql = ''' INSERT IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
+              VALUES(%s, %s, %s, %s)'''
+        cur = self.conn.cursor()
+        cur._defer_warnings = True
+        for tweet in tweets:
+            tweet_text = format_tweet_text(tweet['text'])
+            cur.execute(sql, (tweet['tweet_id'], tweet_text, tweet['user_screen_name'].lower(), tweet['created_at']))
+        self.conn.commit()
+
+    def query_all_tweets(self, screen_name):
+        sql = "SELECT * FROM Tweets WHERE ScreenName=%s"
+        cur = self.conn.cursor()
+        cur.execute(sql, screen_name)
+        
+        tweets = cur.fetchall()
+        return tweets
+
+    
+    def query_all_tweets_limit(self, screen_name, limit):
+        sql = "SELECT * FROM Tweets WHERE ScreenName=%s limit %s"
+        cur = self.conn.cursor()
+        cur.execute(sql, (screen_name, limit))
+        tweets = cur.fetchall()
+        return tweets
+
+
+    def close(self):
+        self.conn.close()
