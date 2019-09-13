@@ -391,6 +391,8 @@ htmlcov/
 
 
 # Jason's ignores
+mysql_aws_credentials.py
+mysql_aws_credentials.py~
 credentials.py
 credentials.py~
 credentials1.py
