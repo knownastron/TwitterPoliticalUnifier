@@ -1,18 +1,8 @@
 import sqlite3
 
-class DatabaseConnection():
-    def __init__(self, database_name):
-        self.conn = sqlite3.connect(database_name)
-
-    def write_conservative(self, info):
-        """
-        info:
-        """
-        sql = ''' INSERT INTO Users(ScreenName, UserId, PolLabel)
-              VALUES(?,?,?) '''
-        cur = self.conn.cursor()
-        cur.execute(sql, info)
-        self.conn.commit()
+class SQLConnection():
+    def __init__(self, conn):
+        self.conn = conn;
 
     def write_new_user(self, info):
         """
@@ -49,3 +39,14 @@ class DatabaseConnection():
 
     def close(self):
         self.conn.close()
+
+class LocalConnection(SQLConnection):
+    def __init__(self, database_name):
+        conn = sqlite3.connect(database_name)
+        super(LocalConnection, self).__init__(conn)
+
+'''        
+class AWSConnection(SQLConnection):
+    def __init__(self, database_name):
+        pass
+'''
