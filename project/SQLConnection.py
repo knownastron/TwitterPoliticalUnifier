@@ -1,6 +1,6 @@
 import sqlite3
 import pymysql
-from format import format_tweet_text
+import Format
 
 class SQLConnection():
     def __init__(self, conn):
@@ -21,24 +21,47 @@ class SQLConnection():
         sql = ''' INSERT OR IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
               VALUES(?,?,?,?) '''
         cur = self.conn.cursor()
-        cur.execute(sql, (TweetId, Text, ScreenName, Date))
+        cur.execute(sql, (TweetId, Text, ScreenName, Date,))
         self.conn.commit()
 
+    def write_tweets(self, tweets):
+        sql = ''' INSERT OR IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
+              VALUES(?, ?, ?, ?)'''
+        cur = self.conn.cursor()
+        for tweet in tweets:
+            tweet_text = Format.format_tweet_text(tweet['text'])
+            cur.execute(sql, (tweet['tweet_id'], tweet_text, tweet['user_screen_name'].lower(), tweet['created_at']))
+        self.conn.commit()
 
-    def query_all_tweets(self, screen_name):
+        
+    def get_all_tweets_by(self, screen_name):
         sql = "SELECT * FROM Tweets WHERE ScreenName=?"
         cur = self.conn.cursor()
-        cur.execute(sql, screen_name)
+        cur.execute(sql, (screen_name,))
         tweets = cur.fetchall()
         return tweets
 
-    def query_all_tweets_limit(self, screen_name, limit):
+    def get_all_tweets_by_limit(self, screen_name, limit):
         sql = "SELECT * FROM Tweets WHERE ScreenName=? limit ?"
         cur = self.conn.cursor()
         cur.execute(sql, (screen_name, limit))
         tweets = cur.fetchall()
         return tweets
 
+    def get_num_tweets_by(self, screen_name):
+        sql = "SELECT COUNT(*) FROM Tweets where ScreenName=?"
+        cur = self.conn.cursor()
+        cur.execute(sql, [screen_name])
+        count = cur.fetchone()
+        return count[0]
+
+    def get_users_by_pol_label(self, pol_label):
+        sql = "SELECT * FROM Users where PolLabel = ?"
+        cur = self.conn.cursor()
+        cur.execute(sql, (pol_label,))
+        users = cur.fetchall()
+        return users  
+    
     def close(self):
         self.conn.close()
 
@@ -79,7 +102,7 @@ class AWSConnection():
             cur.execute(sql, (tweet['tweet_id'], tweet_text, tweet['user_screen_name'].lower(), tweet['created_at']))
         self.conn.commit()
 
-    def query_all_tweets(self, screen_name):
+    def get_all_tweets(self, screen_name):
         sql = "SELECT * FROM Tweets WHERE ScreenName=%s"
         cur = self.conn.cursor()
         cur.execute(sql, screen_name)
@@ -88,13 +111,27 @@ class AWSConnection():
         return tweets
 
     
-    def query_all_tweets_limit(self, screen_name, limit):
+    def get_all_tweets_by_limit(self, screen_name, limit):
         sql = "SELECT * FROM Tweets WHERE ScreenName=%s limit %s"
         cur = self.conn.cursor()
         cur.execute(sql, (screen_name, limit))
         tweets = cur.fetchall()
         return tweets
 
+    def get_num_tweets_by(self, screen_name):
+        sql = "SELECT COUNT(*) FROM Tweets where ScreenName=%s"
+        cur = self.conn.cursor()
+        cur.execute(sql, (screen_name,))
+        count = cur.fetchone()
+        return count[0]
+
+    def get_users_by_pol_label(self, pol_label):
+        sql = "SELECT * FROM Users where PolLabel = %s"
+        cur = self.conn.cursor()
+        cur.execute(sql, (pol_label,))
+        users = cur.fetchall()
+        return users  
+        
 
     def close(self):
         self.conn.close()
