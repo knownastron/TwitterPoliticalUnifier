@@ -6,7 +6,7 @@ class SQLConnection():
     def __init__(self, conn):
         self.conn = conn;
 
-        
+
     def write_new_user(self, ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict):
         """
         Requires 4 items for info, use None if it doesn't exist
@@ -33,7 +33,7 @@ class SQLConnection():
             cur.execute(sql, (tweet['tweet_id'], tweet_text, tweet['user_screen_name'].lower(), tweet['created_at']))
         self.conn.commit()
 
-        
+
     def get_all_tweets_by(self, screen_name):
         sql = "SELECT * FROM Tweets WHERE ScreenName=?"
         cur = self.conn.cursor()
@@ -60,8 +60,8 @@ class SQLConnection():
         cur = self.conn.cursor()
         cur.execute(sql, (pol_label,))
         users = cur.fetchall()
-        return users  
-    
+        return users
+
     def close(self):
         self.conn.close()
 
@@ -74,7 +74,7 @@ class LocalConnection(SQLConnection):
 class AWSConnection():
     def __init__(self, host, port, dbname, user, password):
         self.conn = pymysql.connect(host, user=user, port=port, passwd=password, db=dbname)
-        
+
     def write_new_user(self, ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict):
         """
         Requires 4 items for info, use None if it doesn't exist
@@ -102,15 +102,15 @@ class AWSConnection():
             cur.execute(sql, (tweet['tweet_id'], tweet_text, tweet['user_screen_name'].lower(), tweet['created_at']))
         self.conn.commit()
 
-    def get_all_tweets(self, screen_name):
+    def get_all_tweets_by(self, screen_name):
         sql = "SELECT * FROM Tweets WHERE ScreenName=%s"
         cur = self.conn.cursor()
         cur.execute(sql, screen_name)
-        
+
         tweets = cur.fetchall()
         return tweets
 
-    
+
     def get_all_tweets_by_limit(self, screen_name, limit):
         sql = "SELECT * FROM Tweets WHERE ScreenName=%s limit %s"
         cur = self.conn.cursor()
@@ -130,8 +130,8 @@ class AWSConnection():
         cur = self.conn.cursor()
         cur.execute(sql, (pol_label,))
         users = cur.fetchall()
-        return users  
-        
+        return users
+
 
     def close(self):
         self.conn.close()
