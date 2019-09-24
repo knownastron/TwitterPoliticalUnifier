@@ -1,4 +1,7 @@
 import re
+import nltk
+nltk.download('stopwords')
+import string
 
 
 class Format():
@@ -55,4 +58,28 @@ class Format():
     def remove_punctuation(text):
         return text.translate(str.maketrans('','',string.punctuation + '—' + '“' + '…'))
 
-    
+    @staticmethod
+    def remove_stopwords(input_text):
+        stopwords = set(nltk.corpus.stopwords.words('english'))
+        stopwords.add('it\'s')
+        stopwords.add('w/')
+        stopwords.add('\'s')
+        input_text_split = input_text.split()
+        output_text_split = [word for word in input_text_split if word not in stopwords]
+        return " ".join(output_text_split)
+
+    @staticmethod
+    def remove_punctuation(text):
+        return text.translate(str.maketrans('','',string.punctuation + '—' + '“' + '…' + '\’' + ''\”'))
+
+    @staticmethod
+    def denoise_tweet(tweet_text):
+        tweet_text = tweet_text.lower()
+        tweet_text = Format.remove_hyperlinks(tweet_text)
+        tweet_text = Format.remove_picture_links(tweet_text)
+        tweet_text = Format.remove_hashtags(tweet_text)
+        tweet_text = Format.remove_mentions(tweet_text)
+        tweet_text = Format.remove_picture_links(tweet_text)
+        tweet_text = Format.remove_stopwords(tweet_text)
+        tweet_text = Format.remove_punctuation(tweet_text)
+        return tweet_text
