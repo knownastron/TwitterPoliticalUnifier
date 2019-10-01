@@ -102,6 +102,16 @@ class AWSConnection():
             cur.execute(sql, (tweet['tweet_id'], tweet_text, tweet['user_screen_name'].lower(), tweet['created_at']))
         self.conn.commit()
 
+    def write_tweets_temp(self, tweets):
+        sql = ''' INSERT IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
+              VALUES(%s, %s, %s, %s)'''
+        cur = self.conn.cursor()
+        cur._defer_warnings = True
+        for tweet in tweets:
+            cur.execute(sql, (tweet[0], tweet[1], tweet[2], tweet[3]))
+        self.conn.commit()
+        
+
     def get_all_tweets_by(self, screen_name):
         sql = "SELECT * FROM Tweets WHERE ScreenName=%s"
         cur = self.conn.cursor()
