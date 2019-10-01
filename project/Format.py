@@ -2,9 +2,14 @@ import re
 import nltk
 nltk.download('stopwords')
 import string
+from nltk.stem.porter import PorterStemmer
 
 
 class Format():
+    stem = PorterStemmer()
+    stopwords = set(nltk.corpus.stopwords.words('english') + ['it\'s', 'w/', '\'s'])
+
+
     @staticmethod
     def format_tweet_text(text):
         '''
@@ -59,18 +64,26 @@ class Format():
         return text.translate(str.maketrans('','',string.punctuation + '—' + '“' + '…'))
 
     @staticmethod
-    def remove_stopwords(input_text):
-        stopwords = set(nltk.corpus.stopwords.words('english'))
-        stopwords.add('it\'s')
-        stopwords.add('w/')
-        stopwords.add('\'s')
-        input_text_split = input_text.split()
-        output_text_split = [word for word in input_text_split if word not in stopwords]
-        return " ".join(output_text_split)
+    def remove_stopwords(input_text_split):
+        """
+        :param input_text: an array of strings
+        :return: an array of strings
+        """
+        output_text_split = [word for word in input_text_split if word not in Format.stopwords]
+        return output_text_split
+
+    @staticmethod
+    def stem_words(input_text_split):
+        """
+        :param input_text_split: An array of strings
+        :return: an array of strings
+        """
+        stemmed_output = [Format.stem.stem(word) for word in input_text_split]
+        return stemmed_output
 
     @staticmethod
     def remove_punctuation(text):
-        return text.translate(str.maketrans('','',string.punctuation + '—' + '“' + '…' + '\’' + '\”'))
+        return text.translate(str.maketrans('', '', string.punctuation + '—' + '“' + '…' + '\’' + '\”'))
 
     @staticmethod
     def denoise_tweet(tweet_text):
@@ -80,6 +93,9 @@ class Format():
         tweet_text = Format.remove_hashtags(tweet_text)
         tweet_text = Format.remove_mentions(tweet_text)
         tweet_text = Format.remove_picture_links(tweet_text)
-        tweet_text = Format.remove_stopwords(tweet_text)
         tweet_text = Format.remove_punctuation(tweet_text)
-        return tweet_text
+        tweet_text_split = tweet_text.split()
+        tweet_text_split = Format.remove_stopwords(tweet_text_split)
+        tweet_text_split = Format.stem_words(tweet_text_split)
+
+        return " ".join(tweet_text_split)
