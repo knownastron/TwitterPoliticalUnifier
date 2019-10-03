@@ -1,6 +1,6 @@
 import sqlite3
 import pymysql
-import Format
+from Format import Format
 
 class SQLConnection():
     def __init__(self, conn):
@@ -29,7 +29,7 @@ class SQLConnection():
               VALUES(?, ?, ?, ?)'''
         cur = self.conn.cursor()
         for tweet in tweets:
-            tweet_text = Format.format_tweet_text(tweet['text'])
+            tweet_text = tweet['text']
             cur.execute(sql, (tweet['tweet_id'], tweet_text, tweet['user_screen_name'].lower(), tweet['created_at']))
         self.conn.commit()
 
@@ -82,14 +82,14 @@ class AWSConnection():
         sql = ''' INSERT IGNORE INTO Users(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict)
               VALUES(%s, %s, %s, %s, %s) '''
         cur = self.conn.cursor()
-        cur.execute(sql, (ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict))
+        cur.execute(sql, (Format.format_username(ScreenName), UserId, UserIdStr, PolLabel, PolLabelPredict))
         self.conn.commit()
 
     def write_tweet(self, TweetId, Text, ScreenName, Date):
         sql = ''' INSERT IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
               VALUES(%s, %s, %s, %s)'''
         cur = self.conn.cursor()
-        cur.execute(sql, (TweetId, Text, ScreenName, Date))
+        cur.execute(sql, (TweetId, Text, Format.format_username(ScreenName), Date))
         self.conn.commit()
 
     def write_tweets(self, tweets):
@@ -98,8 +98,7 @@ class AWSConnection():
         cur = self.conn.cursor()
         cur._defer_warnings = True
         for tweet in tweets:
-            tweet_text = format_tweet_text(tweet['text'])
-            cur.execute(sql, (tweet['tweet_id'], tweet_text, tweet['user_screen_name'].lower(), tweet['created_at']))
+            cur.execute(sql, (tweet['tweet_id'], tweet['text'], Format.format_username(tweet['user_screen_name']), tweet['created_at']))
         self.conn.commit()
 
     def write_tweets_temp(self, tweets):
@@ -119,7 +118,6 @@ class AWSConnection():
 
         tweets = cur.fetchall()
         return tweets
-
 
     def get_all_tweets_by_limit(self, screen_name, limit):
         sql = "SELECT * FROM Tweets WHERE ScreenName=%s limit %s"
