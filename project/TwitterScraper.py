@@ -21,7 +21,6 @@ __author__ = 'Tom Dickinson'
 
 
 class TwitterSearch(object):
-
     __meta__ = ABCMeta
 
     def __init__(self, rate_delay, error_delay=5):
@@ -136,7 +135,7 @@ class TwitterSearch(object):
             # Tweet date
             date_span = li.find("span", class_="_timestamp")
             if date_span is not None:
-                t = datetime.datetime.fromtimestamp((float(date_span['data-time-ms'])/1000))
+                t = datetime.datetime.fromtimestamp((float(date_span['data-time-ms']) / 1000))
                 fmt = "%Y-%m-%d %H:%M:%S"
                 tweet['created_at'] = t.strftime(fmt)
 
@@ -186,7 +185,7 @@ class TwitterSearch(object):
 
 class TwitterSearchImpl(TwitterSearch):
 
-    def __init__(self, rate_delay, error_delay, max_tweets):
+    def __init__(self, max_tweets, rate_delay=5, error_delay=5):
         """
         :param rate_delay: How long to pause between calls to Twitter
         :param error_delay: How long to pause when an error occurs
@@ -196,19 +195,23 @@ class TwitterSearchImpl(TwitterSearch):
         self.max_tweets = max_tweets
         self.counter = 0
         self.saved_tweets = []
+        self.tweet_ids = set() # used to make sure duplicate tweets not added
 
     def save_tweets(self, tweets):
         """
-        Just prints out tweets
+        Saves tweets to member variable saved_tweets
         :return:
         """
         for tweet in tweets:
             # Lets add a counter so we only collect a max number of tweets
-            self.counter += 1
+
 
             if tweet['created_at'] is not None:
-#                log.info("%i [%s] - %s" % (self.counter, tweet['created_at'], tweet['text']))
+                if tweet['tweet_id'] in self.tweet_ids: # make sure no duplicates
+                    continue
+                self.tweet_ids.add(tweet['tweet_id'])
                 self.saved_tweets.append(tweet)
+                self.counter += 1
                 # print(self.counter)
                 # print('tweet_id', tweet['tweet_id'])
                 # print('user_id', tweet['user_id'])
@@ -230,6 +233,7 @@ class TwitterSearchImpl(TwitterSearch):
 
     def clear_tweets(self):
         self.saved_tweets = []
+        self.tweet_ids = set()
         self.counter = 0
 
 
@@ -240,6 +244,7 @@ class TwitterSlicer(TwitterSearch):
     The only additional parameters a user has to input, is a minimum date, and a maximum date.
     This method also supports parallel scraping.
     """
+
     def __init__(self, rate_delay, error_delay, since, until, n_threads=1):
         super(TwitterSlicer, self).__init__(rate_delay, error_delay)
         self.since = since
@@ -285,6 +290,7 @@ class TwitterSlicer(TwitterSearch):
 
     def clear_tweets(self):
         self.saved_tweets = []
+
 
 '''
 if __name__ == '__main__':
@@ -339,7 +345,7 @@ if __name__ == '__main__':
     rate_delay_seconds = 0
     error_delay_seconds = 5
 
-#    Example of using TwitterSearch
+    #    Example of using TwitterSearch
     twit = TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, None)
     twit.search(search_query)
     tweets = twit.get_tweets()
@@ -355,8 +361,8 @@ if __name__ == '__main__':
     twitSlice.search(search_query)
     tweets = twitSlice.get_tweets()
     '''
-    for tweet in tweets:
-        print(tweet)
+    for t in tweets:
+        print(t)
 
     print("TwitterSearch collected %i" % twit.counter)
-    #print("TwitterSlicer collected %i" % twitSlice.counter)
+    # print("TwitterSlicer collected %i" % twitSlice.counter)
