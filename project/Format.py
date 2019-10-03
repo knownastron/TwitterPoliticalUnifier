@@ -26,10 +26,15 @@ class Format():
 
     @staticmethod
     def format_username(username):
-        if username[0] != '@':
-            return '@' + username
+        """
+        removes @ symbol and lowers the username
+        :param username:
+        :return:
+        """
+        if username[0] == '@':
+            return username[1:].lower()
         else:
-            return username
+            return username.lower()
 
     @staticmethod
     def remove_new_line(text):
