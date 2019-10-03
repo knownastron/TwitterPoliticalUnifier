@@ -6,8 +6,8 @@ from tweepy import API
 from tweepy import OAuthHandler
 from tweepy import Cursor
 from tweepy import RateLimitError
+from Format import Format
 
-import format
 import twitter_credentials
 
 
@@ -62,7 +62,7 @@ class TwitterConnection:
                 count += 1
             if status.full_text[:2] == 'RT':  # skips retweets
                 continue
-            tweet_texts.append(format.formatTweetText(status.full_text))
+            tweet_texts.append(status.full_text)
 
         return tweet_texts
 
@@ -77,7 +77,7 @@ class TwitterConnection:
         friend_list = []
         count = 0
         for user in limit_handled(Cursor(self.api.friends, screen_name=username).items(num_followers)):
-            cur_following = format.format_username(user.screen_name)
+            cur_following = Format.format_username(user.screen_name)
             friend_list.append(cur_following)
             if print_progress:
                 print('get_follower', count, cur_following)
@@ -95,7 +95,7 @@ class TwitterConnection:
         follower_list = []
         count = 1
         for follower in limit_handled(Cursor(self.api.followers, screen_name=username).items(num_followers)):
-            cur_follower = format.format_username(follower.screen_name)
+            cur_follower = Format.format_username(follower.screen_name)
             follower_list.append(cur_follower)
             if print_progress:
                 print('get_follower', count, cur_follower)
@@ -116,7 +116,7 @@ class TwitterConnection:
         likers = re.findall(
             'div class=\\\\"account  js-actionable-user js-profile-popup-actionable \\\\" data-screen-name=\\\\"(.+?)\\\\" data-user-id=\\\\"',
             text)
-        likers = [format.format_username(x) for x in likers]
+        likers = [Format.format_username(x) for x in likers]
         return likers
 
     def get_usernames_of_tweets_liked_by(self, username, fav_count, print_progress=False):
@@ -130,7 +130,7 @@ class TwitterConnection:
         usernames = []
         count = 0
         for fav in limit_handled(Cursor(self.api.favorites, screen_name=username).items(fav_count)):
-            cur_user = format.format_username(fav.author.screen_name)
+            cur_user = Format.format_username(fav.author.screen_name)
             usernames.append(cur_user)
             if print_progress:
                 print('username_of_tweets_liked_by', count, cur_user)
