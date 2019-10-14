@@ -6,6 +6,11 @@
   text-align: center;
 }
 
+.AppBody {
+  text-align: center;
+  display: inline-block;
+}
+
 
 /* .App-header {
   background-color: #282c34;
@@ -19,5 +24,11 @@
 } */
 
 .App-link {
-  color: #09d3ac;
+  color: white;
+}
+
+@font-face {
+  font-family: "SFDisplay";
+  /* font-weight: 400; */
+  src: url("https://sf.abarba.me/SF-UI-Display-Regular.otf");
 }
