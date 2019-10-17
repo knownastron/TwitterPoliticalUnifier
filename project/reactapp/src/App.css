@@ -9,6 +9,17 @@
 .AppBody {
   text-align: center;
   display: inline-block;
+  width: 80%;
+}
+
+.component-main-div {
+  background-color: #FAFAFA;
+  /* background-color: red; */
+  padding: 10%;
+  display: table;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 
