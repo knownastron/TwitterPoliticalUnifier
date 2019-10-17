@@ -18,13 +18,14 @@ function App() {
         <Header />
         <div className="AppBody">
         <Switch>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/">
+          <Route exact path="/">
             <TweetInputForm />
             <LabelUser />
           </Route>
+          <Route path="/about">
+            <About />
+          </Route>
+
 
         </Switch>
 
