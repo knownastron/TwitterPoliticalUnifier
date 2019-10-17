@@ -28,7 +28,7 @@ class TweetInputForm extends React.Component {
 
   render() {
     return (
-      <div className="form-parent">
+      <div className="component-main-div">
         <form onSubmit={this.submission}>
           <label htmlFor="email">Email</label>
           <input type="text"

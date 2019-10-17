@@ -1,14 +1,8 @@
-.form-parent {
-  background-color: #FAFAFA;
-  padding: 10%
-}
-
 /* Style inputs */
 input[type=text], select {
   width: 100%;
+  max-width: 800px;
   padding: 12px 20px;
-  /* margin: 8px 0; */
-  display: inline-block;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
@@ -41,6 +35,11 @@ label {
 
 .error {
   background-color: red;
+}
+
+form {
+  width: 500px;
+  display: inline-block;
 }
 
 /* @font-face {
