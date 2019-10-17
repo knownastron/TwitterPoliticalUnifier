@@ -10,15 +10,13 @@ class Header extends React.Component {
         <h3 className="title">Twitter Political Unifier</h3>
 
         <div className="header-right">
-          <a className="active" href="#home">Home</a>
+          <a className="active" href="/">Home</a>
           <a href="#contact">Contact</a>
-          <a href="#about">About</a>
+          <a href="about">About</a>
         </div>
       </div>
     );
   }
-
-
 }
 
 export default Header;
