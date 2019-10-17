@@ -1,5 +1,6 @@
 import React from 'react'
 import './Header.css'
+import { Link } from 'react-router-dom'
 
 class Header extends React.Component {
 
@@ -10,9 +11,10 @@ class Header extends React.Component {
         <h3 className="title">Twitter Political Unifier</h3>
 
         <div className="header-right">
-          <a className="active" href="/">Home</a>
-          <a href="#contact">Contact</a>
-          <a href="about">About</a>
+          <Link to="/">Home</Link>
+          <Link to="/contact">Contact</Link>
+          <Link to="/about">About</Link>
+
         </div>
       </div>
     );
