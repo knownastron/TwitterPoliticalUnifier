@@ -406,3 +406,4 @@ neo4j_credentials.py~
 idea.md
 __pycache__/
 *.pyc
+config.js
