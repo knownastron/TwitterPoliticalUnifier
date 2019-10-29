@@ -15,15 +15,12 @@ class LabelUser extends React.Component {
     e.preventDefault();
     console.log('yaaaa');
     if (this.validateEmail(this.state.email)) {
-      // const cors = 'https://cors.io/?u='
-      // const cors = 'https://crossorigin.me/';
+
       const url = 'http://127.0.0.1:5000/api/1.0/labeluser';
       const xhr = new XMLHttpRequest();
       xhr.open('POST', url);
-      // xhr.withCredentials = true;
       xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       xhr.send(JSON.stringify(this.state));
-      // xhr.send()
 
       xhr.onload = (e) => {
         console.log(xhr.responseText)
@@ -38,18 +35,6 @@ class LabelUser extends React.Component {
       alert('Email error');
     }
 
-  }
-
-  createCORSRequest(method, url) {
-    var xhr = new XMLHttpRequest();
-    if ("withCredentials" in xhr) {
-      // XHR for Chrome/Firefox/Opera/Safari.
-      xhr.open(method, url, true);
-    } else {
-        // CORS not supported.
-        xhr = null;
-    }
-      return xhr;
   }
 
   emailChange = (e) => {
@@ -69,7 +54,7 @@ class LabelUser extends React.Component {
           <input type="text"
             id="emailInput"
             name="email"
-            placeholder="your email address"
+            placeholder="Email Address"
             onBlur={this.emailChange}/>
 
           <label htmlFor="username">Twitter Username</label>
