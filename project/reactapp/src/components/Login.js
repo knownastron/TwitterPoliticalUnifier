@@ -1,11 +1,12 @@
 import React from 'react'
 import { Auth } from "aws-amplify";
 
-
 class Login extends React.Component {
   state = {
     email: '',
-    password: ''
+    password: '',
+    toConfirm: true,
+    cuser: '',
   };
 
   validateEmail = (email) => {
@@ -23,36 +24,42 @@ class Login extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await Auth.signIn(this.state.email, this.state.password);
-      console.log(e)
+    await Auth.signIn(
+      this.state.email,
+      this.state.password
+    ).then(user => {
+      console.log(user);
+      this.setState({curUser : user})
+      this.setState({toConfirm: true})
       alert("Logged in");
-    } catch (e) {
-      alert(e.message);
-    }
+    }).catch(err => {
+      console.log(err)
+      alert("Invalid username or password");
+    });
+
   };
 
   render() {
     return (
-      <div className="component-main-div">
-        <h2> Login </h2>
-        <form onSubmit={this.handleSubmit}>
-          <label htmlFor="email">Email</label>
-          <input type="text"
-            id="emailInput"
-            name="email"
-            placeholder="Email Address"
-            onBlur={this.emailChange}/>
+    <div className="component-main-div">
+      <h2> Login </h2>
+      <form onSubmit={this.handleSubmit}>
+        <label htmlFor="email">Email</label>
+        <input type="text"
+          id="emailInput"
+          name="email"
+          placeholder="Email Address"
+          onBlur={this.emailChange}/>
 
-          <label htmlFor="password">Password</label>
-          <input type="password"
-            id="passwordInput"
-            name="passwordInput"
-            placeholder="Password"
-            onBlur={this.passwordChange}/>
-          <input type="submit" value="Submit" />
-        </form>
-      </div>
+        <label htmlFor="password">Password</label>
+        <input type="password"
+          id="passwordInput"
+          name="passwordInput"
+          placeholder="Password"
+          onBlur={this.passwordChange}/>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
     );
   }
 }
