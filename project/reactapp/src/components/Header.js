@@ -3,7 +3,10 @@ import './Header.css'
 import { Link } from 'react-router-dom'
 
 class Header extends React.Component {
-
+  // Remove this later, just for testing purposes
+  test_state = {
+    ya: false
+  }
   render() {
     return (
       <div className="header">
@@ -14,7 +17,10 @@ class Header extends React.Component {
           <Link to="/">Home</Link>
           <Link to="/contact">Contact</Link>
           <Link to="/about">About</Link>
-
+          { this.test_state.ya
+            ? <Link to="/login">Login</Link>
+            : <Link to="/">Logout</Link>
+          }
         </div>
       </div>
     );
