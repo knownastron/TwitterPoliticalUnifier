@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 class Header extends React.Component {
   // Remove this later, just for testing purposes
   test_state = {
-    ya: false
+    ya: true 
   }
   render() {
     return (
