@@ -11,7 +11,7 @@ class SQLConnection():
         """
         Requires 4 items for info, use None if it doesn't exist
         """
-        sql = ''' INSERT OR IGNORE INTO Users(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict)
+        sql = ''' INSERT OR IGNORE INTO TwitterUsers(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict)
               VALUES(?,?,?,?,?) '''
         cur = self.conn.cursor()
         cur.execute(sql, info)
@@ -56,7 +56,7 @@ class SQLConnection():
         return count[0]
 
     def get_users_by_pol_label(self, pol_label):
-        sql = "SELECT * FROM Users where PolLabel = ?"
+        sql = "SELECT * FROM TwitterUsers where PolLabel = ?"
         cur = self.conn.cursor()
         cur.execute(sql, (pol_label,))
         users = cur.fetchall()
@@ -79,7 +79,7 @@ class AWSConnection():
         """
         Requires 4 items for info, use None if it doesn't exist
         """
-        sql = ''' INSERT IGNORE INTO Users(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict)
+        sql = ''' INSERT IGNORE INTO TwitterUsers(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict)
               VALUES(%s, %s, %s, %s, %s) '''
         cur = self.conn.cursor()
         cur.execute(sql, (Format.format_username(ScreenName), UserId, UserIdStr, PolLabel, PolLabelPredict))
@@ -134,7 +134,7 @@ class AWSConnection():
         return count[0]
 
     def get_users_by_pol_label(self, pol_label):
-        sql = "SELECT * FROM Users where PolLabel = %s"
+        sql = "SELECT * FROM TwitterUsers where PolLabel = %s"
         cur = self.conn.cursor()
         cur.execute(sql, (pol_label,))
         users = cur.fetchall()
