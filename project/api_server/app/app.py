@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask_cors import CORS
 
 import os #remove later
 import joblib
@@ -9,16 +10,17 @@ from Services import Format
 from Services import TwitterScraper
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
 @app.route('/index')
 def index():
     user = {'username': 'Tuna'}
-    return render_template('example.html', title='Home', user=user)
+    return 'duuhello'
 
 
-@app.route('/api/1.0/labeluser/<username>', methods = ['GET'])
+@app.route('/api/1.0/labeluser/<username>', methods=['GET', 'OPTIONS'])
 def predictUsername(username):
     return json.dumps({'username': username, 'label': 'conservative'})
 
