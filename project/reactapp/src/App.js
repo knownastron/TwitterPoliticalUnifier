@@ -7,11 +7,12 @@ import LabelUser from './components/LabelUser'
 import LabelTweet from './components/LabelTweet'
 import Login from './components/Login'
 import SignUp from './components/SignUp'
+import Verify from './components/Verify'
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  // Link
 } from "react-router-dom"
 
 function App() {
@@ -32,11 +33,10 @@ function App() {
             <Login />
             <SignUp />
           </Route>
-
-
+          <Route path="/verify">
+            <Verify />
+          </Route>
         </Switch>
-
-
         </div>
       </div>
     </Router>
