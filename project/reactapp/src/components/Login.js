@@ -1,48 +1,42 @@
 import React from 'react';
-import { Auth } from "aws-amplify";
-import { Redirect } from "react-router";
+import PropTypes from 'prop-types'
+// import { Auth } from 'aws-amplify';
+import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
+import { loginUser } from '../actions/authActions';
+
+
 
 class Login extends React.Component {
   state = {
     email: '',
     password: '',
     toConfirm: false,
-    cuser: '',
   };
 
   validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   }
 
-  emailChange = (e) => {
-    this.setState({email: e.target.value});
-  }
-
-  passwordChange = (e) => {
-    this.setState({password: e.target.value});
+  onChange = (e) => {
+    this.setState({[e.target.name] : e.target.value})
   }
 
   handleSubmit = async (e) => {
     e.preventDefault();
+    const loginInfo = {
+      email: this.state.email,
+      password: this.state.password
+    }
 
-    await Auth.signIn(
-      this.state.email,
-      this.state.password
-    ).then(user => {
-      console.log(user);
-      this.setState({curUser : user})
-      this.setState({toConfirm: true})
-      alert("Logged in");
-    }).catch(err => {
-      if (err.code === 'UserNotConfirmedException') {
-        alert("User has not been confirmed")
-        this.setState({toConfirm: true});
-      }
-      console.log(err)
-      alert("Invalid username or password");
-    });
+    this.props.loginUser(loginInfo)
+  }
 
-  };
+  ya = e => {
+    e.preventDefault();
+    console.log(this.props.isAuthenticated);
+  }
+
 
   render() {
     if (!this.state.toConfirm) {
@@ -55,23 +49,28 @@ class Login extends React.Component {
               id="emailInput"
               name="email"
               placeholder="Email Address"
-              onBlur={this.emailChange}/>
+              onChange={this.onChange}/>
 
             <label htmlFor="password">Password</label>
             <input type="password"
               id="passwordInput"
-              name="passwordInput"
+              name="password"
               placeholder="Password"
-              onBlur={this.passwordChange}/>
+              onChange={this.onChange}/>
             <input type="submit" value="Submit" />
           </form>
         </div>
       );
     } else {
-      return (<Redirect to="/" />)
+      return (<Redirect to="/verify" />)
 
     }
   }
 }
 
-export default Login;
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated
+  // posts: state.auth.
+})
+
+export default connect(mapStateToProps, { loginUser })(Login);
