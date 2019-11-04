@@ -14,12 +14,8 @@ class Verify extends React.Component {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   }
 
-  emailChange = (e) => {
-    this.setState({email: e.target.value});
-  }
-
-  codeChange = (e) => {
-    this.setState({code: e.target.value})
+  onChange = (e) => {
+    this.setState({[e.target.name] : e.target.value})
   }
 
   handleSubmit = async (e) => {
@@ -39,8 +35,13 @@ class Verify extends React.Component {
   }
 
   resendCode = async (e) => {
-    if (this.state.email.length == 0) {
+    if (this.state.email.length === 0) {
       alert("Email/username cannot be empty");
+      return
+    }
+
+    if (!this.validateEmail(this.state.email)) {
+      alert("Invalid email");
       return
     }
     Auth.resendSignUp(this.state.email)
@@ -62,14 +63,14 @@ class Verify extends React.Component {
               id="emailInput"
               name="email"
               placeholder="Email Address"
-              onBlur={this.emailChange}/>
+              onChange={this.onChange}/>
 
             <label htmlFor="code">Verification Code</label>
             <input type="password"
               id="codeInput"
-              name="codeInput"
+              name="code"
               placeholder="Verification Code"
-              onBlur={this.codeChange}/>
+              onChange={this.onChange}/>
             <input type="submit" value="Submit" />
           </form>
           <p>

@@ -1,5 +1,6 @@
 #logo {
-  margin-top: 5px;
+  margin-top: 6px;
+  margin-right: 14px;
   float: left;
   width: 40px;
   height: 40px;
@@ -8,7 +9,14 @@
 .header {
   overflow: hidden;
   background-color: #323232;
-  padding: 10px 10px;
+  /* padding: 10px; */
+  width: 100%;
+
+}
+
+#header-content {
+  width: 80%;
+  margin: 0 auto;
 }
 
 /* Style the header links */
@@ -17,10 +25,10 @@
   float: left;
   color: white;
   text-align: center;
-  padding: 12px;
+  padding: 18px;
   text-decoration: none;
   font-size: 18px;
-  line-height: 25px;
+  line-height: 20px;
   border-radius: 4px;
 }
 .title {
@@ -28,12 +36,12 @@
   float: left;
   color: white;
   text-align: center;
-  padding: 12px;
+  padding-top: 14px;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 10px;
   line-height: 25px;
   border-radius: 4px;
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
   pointer-events: none
 }

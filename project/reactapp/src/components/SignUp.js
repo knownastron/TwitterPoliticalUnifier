@@ -2,7 +2,6 @@ import React from 'react'
 import { Auth } from 'aws-amplify';
 import { Link } from "react-router-dom";
 import { Redirect } from "react-router"
-import Verify from "./Verify"
 
 class SignUp extends React.Component {
   state = {
@@ -10,7 +9,6 @@ class SignUp extends React.Component {
     password1: '',
     password2: '',
     toVerify: false,
-    code : '',
     success: false
   };
 
@@ -18,20 +16,8 @@ class SignUp extends React.Component {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   }
 
-  emailChange = (e) => {
-    this.setState({email: e.target.value.toLowerCase()});
-  }
-
-  passwordChange1 = (e) => {
-    this.setState({password1: e.target.value});
-  }
-
-  passwordChange2 = (e) => {
-    this.setState({password2: e.target.value});
-  }
-
-  codeChange = (e) => {
-    this.setState({code: e.target.value});
+  onChange = (e) => {
+    this.setState({[e.target.name] : e.target.value})
   }
 
   handleNewSubmit = async (e) => {
@@ -97,21 +83,21 @@ class SignUp extends React.Component {
               id="emailInput"
               name="email"
               placeholder="Email Address"
-              onChange={this.emailChange}/>
+              onChange={this.onChange}/>
 
             <label htmlFor="password1">Password</label>
             <input type="password"
               id="passwordInput1"
-              name="passwordInput1"
+              name="password1"
               placeholder="Password"
-              onChange={this.passwordChange1}/>
+              onChange={this.onChange}/>
 
           <label htmlFor="password2">Re-enter Password</label>
           <input type="password"
             id="passwordInput2"
-            name="passwordInput2"
+            name="password2"
             placeholder="Re-enter Password"
-            onChange={this.passwordChange2}/>
+            onChange={this.onChange}/>
           <input type="submit" value="Submit"  />
         </form>
         </div>
@@ -119,21 +105,6 @@ class SignUp extends React.Component {
     } else {
       return (
         <Redirect to='/Verify' />
-        // <div className="component-main-div">
-        //   <h2>Verify email</h2>
-        //   <form onSubmit={this.handleVerifySubmit}>
-        //   <label htmlFor="code">Verification Code</label>
-        //     <input type="password"
-        //       id="codeInput"
-        //       name="codeInput"
-        //       placeholder="Verification Code"
-        //       onBlur={this.codeChange}/>
-        //     <input type="submit" value="Submit" />
-        //   </form>
-        //   <p>
-        //     <button class="link">Resend confirmation code</button>
-        //   </p>
-        // </div>
       )
     }
   }
