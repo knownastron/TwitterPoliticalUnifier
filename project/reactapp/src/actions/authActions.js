@@ -6,7 +6,8 @@ export const loginUser = (loginInfo) => async dispatch => {
     loginInfo.email,
     loginInfo.password
   ).then(user => {
-    console.log(user);
+    console.log(user)
+    // console.log(user.signInUserSession.idToken.jwtToken);
     dispatch({
       type: LOGIN_USER_SUCCESS,
       payload: user,
@@ -36,10 +37,3 @@ export const logoutUser = () => async dispatch => {
     })
     .catch(err => console.log(err));
 }
-// export function loginUser(loginInfo) {
-//   console.log("LOGIN ACTION called", loginInfo);
-//   return async function(dispatch, loginInfo) {
-//
-//
-//   }
-// }
