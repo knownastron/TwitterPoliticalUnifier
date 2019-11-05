@@ -407,3 +407,4 @@ idea.md
 __pycache__/
 *.pyc
 config.js
+cognito_config.py
