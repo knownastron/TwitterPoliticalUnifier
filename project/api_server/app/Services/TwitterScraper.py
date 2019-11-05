@@ -239,58 +239,58 @@ class TwitterSearchImpl(TwitterSearch):
         self.counter = 0
 
 
-class TwitterSlicer(TwitterSearch):
-    """
-    Inspired by: https://github.com/simonlindgren/TwitterScraper/blob/master/TwitterSucker.py
-    The concept is to have an implementation that actually splits the query into multiple days.
-    The only additional parameters a user has to input, is a minimum date, and a maximum date.
-    This method also supports parallel scraping.
-    """
-    def __init__(self, rate_delay, error_delay, since, until, n_threads=1):
-        super(TwitterSlicer, self).__init__(rate_delay, error_delay)
-        self.since = since
-        self.until = until
-        self.n_threads = n_threads
-        self.counter = 0
-        self.saved_tweets = []
-
-    def search(self, query):
-        n_days = (self.until - self.since).days
-        tp = ThreadPoolExecutor(max_workers=self.n_threads)
-        for i in range(0, n_days):
-            since_query = self.since + datetime.timedelta(days=i)
-            until_query = self.since + datetime.timedelta(days=(i + 1))
-            day_query = "%s since:%s until:%s" % (query, since_query.strftime("%Y-%m-%d"),
-                                                  until_query.strftime("%Y-%m-%d"))
-            tp.submit(self.perform_search, day_query)
-        tp.shutdown(wait=True)
-
-    def save_tweets(self, tweets):
-        """
-        Just prints out tweets
-        :return: True always
-        """
-        for tweet in tweets:
-            # Lets add a counter so we only collect a max number of tweets
-            self.counter += 1
-            if tweet['created_at'] is not None:
-                # print(self.counter)
-                # print('tweet_id', tweet['tweet_id'])
-                # print('user_id', tweet['user_id'])
-                # print('created_at', tweet['created_at'])
-                # print('user_name', tweet['user_name'])
-                # print(tweet['text'])
-                # t = datetime.datetime.fromtimestamp((tweet['created_at']/1000))
-                # fmt = "%Y-%m-%d %H:%M:%S"
-                # log.info("%i [%s] - %s" % (self.counter, t.strftime(fmt), tweet['text']))
-                self.saved_tweets.append(tweet)
-        return True
-
-    def get_tweets(self):
-        return self.saved_tweets
-
-    def clear_tweets(self):
-        self.saved_tweets = []
+# class TwitterSlicer(TwitterSearch):
+#     """
+#     Inspired by: https://github.com/simonlindgren/TwitterScraper/blob/master/TwitterSucker.py
+#     The concept is to have an implementation that actually splits the query into multiple days.
+#     The only additional parameters a user has to input, is a minimum date, and a maximum date.
+#     This method also supports parallel scraping.
+#     """
+#     def __init__(self, rate_delay, error_delay, since, until, n_threads=1):
+#         super(TwitterSlicer, self).__init__(rate_delay, error_delay)
+#         self.since = since
+#         self.until = until
+#         self.n_threads = n_threads
+#         self.counter = 0
+#         self.saved_tweets = []
+#
+#     def search(self, query):
+#         n_days = (self.until - self.since).days
+#         tp = ThreadPoolExecutor(max_workers=self.n_threads)
+#         for i in range(0, n_days):
+#             since_query = self.since + datetime.timedelta(days=i)
+#             until_query = self.since + datetime.timedelta(days=(i + 1))
+#             day_query = "%s since:%s until:%s" % (query, since_query.strftime("%Y-%m-%d"),
+#                                                   until_query.strftime("%Y-%m-%d"))
+#             tp.submit(self.perform_search, day_query)
+#         tp.shutdown(wait=True)
+#
+#     def save_tweets(self, tweets):
+#         """
+#         Just prints out tweets
+#         :return: True always
+#         """
+#         for tweet in tweets:
+#             # Lets add a counter so we only collect a max number of tweets
+#             self.counter += 1
+#             if tweet['created_at'] is not None:
+#                 # print(self.counter)
+#                 # print('tweet_id', tweet['tweet_id'])
+#                 # print('user_id', tweet['user_id'])
+#                 # print('created_at', tweet['created_at'])
+#                 # print('user_name', tweet['user_name'])
+#                 # print(tweet['text'])
+#                 # t = datetime.datetime.fromtimestamp((tweet['created_at']/1000))
+#                 # fmt = "%Y-%m-%d %H:%M:%S"
+#                 # log.info("%i [%s] - %s" % (self.counter, t.strftime(fmt), tweet['text']))
+#                 self.saved_tweets.append(tweet)
+#         return True
+#
+#     def get_tweets(self):
+#         return self.saved_tweets
+#
+#     def clear_tweets(self):
+#         self.saved_tweets = []
 
 '''
 if __name__ == '__main__':
