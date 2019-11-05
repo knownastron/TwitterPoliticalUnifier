@@ -1,6 +1,6 @@
 import React from 'react'
 import { Auth } from 'aws-amplify';
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { Redirect } from "react-router"
 
 class SignUp extends React.Component {
@@ -80,7 +80,7 @@ class SignUp extends React.Component {
           <form onSubmit={this.handleNewSubmit}>
             <label htmlFor="email">Email</label>
             <input type="text"
-              id="emailInput"
+              id="emailSignupInput"
               name="email"
               placeholder="Email Address"
               onChange={this.onChange}/>

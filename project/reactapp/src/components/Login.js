@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 // import { Auth } from 'aws-amplify';
 import { Redirect } from 'react-router';
 import { connect } from 'react-redux';
@@ -46,7 +46,7 @@ class Login extends React.Component {
           <form onSubmit={this.handleSubmit}>
             <label htmlFor="email">Email</label>
             <input type="text"
-              id="emailInput"
+              id="emailLoginInput"
               name="email"
               placeholder="Email Address"
               onChange={this.onChange}/>
