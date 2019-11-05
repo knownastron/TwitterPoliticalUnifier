@@ -1,4 +1,4 @@
-import { LOGIN_USER_SUCCESS, LOGOUT_USER_SUCCESS, IS_LOGGED_IN } from '../actions/types';
+import { LOGIN_USER_SUCCESS, LOGOUT_USER_SUCCESS} from '../actions/types';
 
 const initialState = {
   curUser : '',
@@ -8,7 +8,7 @@ const initialState = {
 }
 
 export default function(state = initialState, action) {
-  let newState = {};
+  // let newState = {};
   switch (action.type) {
     // let newState = {};
 
@@ -21,6 +21,8 @@ export default function(state = initialState, action) {
       // };
       return {
         ...state,
+        curUser: action.payload,
+        email: action.payload.attributes.email,
         isAuthenticated: true
       }
       // return Object.assign({}, state, newState);

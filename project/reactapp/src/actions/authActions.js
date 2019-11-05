@@ -2,12 +2,11 @@ import { LOGIN_USER_SUCCESS, LOGOUT_USER_SUCCESS } from './types';
 import { Auth } from 'aws-amplify';
 
 export const loginUser = (loginInfo) => async dispatch => {
-  // console.log("LOGININFO", loginInfo);
   await Auth.signIn(
     loginInfo.email,
     loginInfo.password
   ).then(user => {
-    // console.log(user);
+    console.log(user);
     dispatch({
       type: LOGIN_USER_SUCCESS,
       payload: user,
@@ -17,7 +16,7 @@ export const loginUser = (loginInfo) => async dispatch => {
   }).catch(err => {
     if (err.code === 'UserNotConfirmedException') {
       alert("User has not been confirmed")
-      // need error handling
+      // need error handling redirect to verify page
       return
     }
     console.log(err)
