@@ -96,6 +96,5 @@ class Format():
         tweet_text = Format.remove_punctuation(tweet_text)
         tweet_text_split = tweet_text.split()
         tweet_text_split = Format.remove_stopwords(tweet_text_split)
-        tweet_text_split = Format.stem_words(tweet_text_split)
 
         return " ".join(tweet_text_split)
