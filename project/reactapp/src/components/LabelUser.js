@@ -1,6 +1,7 @@
 import React from 'react'
 import './LabelTweet.css'
 import { connect } from 'react-redux';
+import axios from 'axios';
 
 class LabelUser extends React.Component {
   state = {
@@ -16,22 +17,22 @@ class LabelUser extends React.Component {
     let token = this.props.token;
     e.preventDefault();
     console.log('yaaaa');
+
+
     if (this.validateEmail(this.state.email)) {
 
       const url = 'http://127.0.0.1:5000/api/1.0/labeluser';
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', url);
-      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      xhr.send(JSON.stringify({...this.state, token}));
 
-      xhr.onload = (e) => {
-        console.log(xhr.responseText)
-      }
-
-      xhr.onerror = (e) => {
-        console.log('error!')
-      }
-
+      axios.post(url, JSON.stringify({
+        ...this.state,
+        'token': token
+      }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
+      .then(function(response) {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+      });
 
     } else {
       alert('Email error');
