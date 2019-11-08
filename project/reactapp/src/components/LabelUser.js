@@ -1,5 +1,6 @@
 import React from 'react'
 import './LabelTweet.css'
+import { connect } from 'react-redux';
 
 class LabelUser extends React.Component {
   state = {
@@ -12,6 +13,7 @@ class LabelUser extends React.Component {
   }
 
   submission = (e) => {
+    let token = this.props.token;
     e.preventDefault();
     console.log('yaaaa');
     if (this.validateEmail(this.state.email)) {
@@ -20,7 +22,7 @@ class LabelUser extends React.Component {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', url);
       xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      xhr.send(JSON.stringify(this.state));
+      xhr.send(JSON.stringify({...this.state, token}));
 
       xhr.onload = (e) => {
         console.log(xhr.responseText)
@@ -71,4 +73,9 @@ class LabelUser extends React.Component {
   }
 }
 
-export default LabelUser;
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated,
+  token: state.auth.token
+})
+
+export default connect(mapStateToProps, {})(LabelUser);
