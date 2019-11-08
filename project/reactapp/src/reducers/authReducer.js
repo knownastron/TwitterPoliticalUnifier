@@ -21,6 +21,7 @@ export default function(state = initialState, action) {
       // };
       return {
         ...state,
+        token: action.payload.signInUserSession.idToken.jwtToken,
         curUser: action.payload,
         email: action.payload.attributes.email,
         isAuthenticated: true
