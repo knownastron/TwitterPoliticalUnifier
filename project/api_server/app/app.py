@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request, url_for, jsonify
+from flask import request, url_for, jsonify, Response
 from flask_api import status
 from flask_cors import CORS
 
@@ -10,7 +10,9 @@ import os #remove later
 import json
 from Services import Format
 from Services import TwitterScraper
-from Services import CeleryTest
+from Tasks import CeleryTest
+from Services import Authentication
+from Services import Responses
 from celery import Celery
 import celery
 
@@ -32,11 +34,13 @@ CORS(app)
 
 #jobListModel = JobListModel(database credentials, etc.)
 
+
 @app.route('/')
 @app.route('/index')
 def index():
     user = {'username': 'Tuna'}
     return 'duuhello'
+
 
 @app.route('/longtask', methods=['POST'])
 def longtask():
@@ -48,6 +52,7 @@ def longtask():
 @app.route('/api/1.0/labeluser/<username>', methods=['GET', 'OPTIONS'])
 def predictUsername(username):
     return json.dumps({'username': username, 'label': 'conservative'})
+
 
 @app.route('/api/1.0/labeltext', methods = ['POST'])
 def predictText():
@@ -68,9 +73,15 @@ def predictText():
 
     return prediction[0] #data['text']
 
+
 @app.route('/api/1.0/labeluser', methods = ['POST'])
 def predictUser():
     data = request.get_json()
+    verify = Authentication.check_jwt(data, None)
+
+    if not verify:
+        return Responses.auth_error()
+
     username = data['username']
 
     # get tweets
@@ -83,7 +94,7 @@ def predictUser():
     print(len(tweets))
     tweets = ' '.join(tweets)
 
-    processed_text = Format.denoise_tweet(tweets)
+    processed_text = Format.Format.denoise_tweet(tweets)
 
 
     # load svm model
@@ -96,7 +107,8 @@ def predictUser():
 
     vectorized_text = vectorizer.transform([processed_text])
     prediction = clf.predict(vectorized_text)
-    return prediction[0]
+    return {'username': username, 'politicalLabel': prediction[0]}
+
 
 '''
 @app.route('/labelTweet', methods=['POST'])
@@ -107,6 +119,7 @@ def labelTweet():
     jobListModel.labelTweet(current_user, twitter_user_id, tweet_id)
     return 200 OK;
 '''
+
 
 @celery.task(bind=True)
 def long_task(self):
