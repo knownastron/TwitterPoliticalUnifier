@@ -31,7 +31,10 @@ export default function(state = initialState, action) {
     case LOGOUT_USER_SUCCESS:
       return {
         ...state,
-        isAuthenticated: false
+        isAuthenticated: false,
+        token: '',
+        email: '',
+        curUser: ''
       }
     default:
      return state;
