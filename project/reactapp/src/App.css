@@ -63,14 +63,8 @@ button.link {
   color: white;
 } */
 
-
-
 @font-face {
   font-family: "SFDisplay";
   /* font-weight: 400; */
   src: url("https://sf.abarba.me/SF-UI-Display-Regular.otf");
-}
-
-.searched-user-item-div {
-  background-color: red;
 }
