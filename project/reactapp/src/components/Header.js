@@ -22,6 +22,7 @@ class Header extends React.Component {
 
           <div className="header-right">
             <Link to="/">Home</Link>
+            <Link to="/dashboard">Dashboard</Link>
             <Link to="/contact">Contact</Link>
             <Link to="/about">About</Link>
             {
