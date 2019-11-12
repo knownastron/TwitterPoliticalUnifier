@@ -6,9 +6,9 @@ from tweepy import API
 from tweepy import OAuthHandler
 from tweepy import Cursor
 from tweepy import RateLimitError
-from Format import Format
+from Services import Format
 
-import twitter_credentials
+from Services import twitter_credentials
 
 
 def limit_handled(cursor):
@@ -138,6 +138,10 @@ class TwitterConnection:
         return usernames
 
     def get_user_ids(self, usernames):
+        """
+        :param usernames: a list of screen names
+        :return: list of tuples (username, user_id_str)
+        """
         user_objects = self.api.lookup_users(screen_names=usernames)
         user_ids = [(user.screen_name, user.id_str) for user in user_objects]
         return user_ids
