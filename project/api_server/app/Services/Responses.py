@@ -1,10 +1,10 @@
-import sys
-sys.path.append('../../')
-from app import app
+# import sys
+# sys.path.append('../../')
+# from app import app
 
 from flask import jsonify, request
 
-@app.errorhandler(404)
+# @app.errorhandler(404)
 def not_found(error=None):
     message = {
             'status': 404,
@@ -15,7 +15,7 @@ def not_found(error=None):
 
     return resp
 
-@app.errorhandler(401)
+# @app.errorhandler(401)
 def auth_error(error=None):
     message = {
         'status': 401,
