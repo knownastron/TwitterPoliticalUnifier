@@ -14,11 +14,6 @@ export default function(state = initialState, action) {
 
     case LOGIN_USER_SUCCESS:
       console.log('reducer')
-      // newState = {
-      //   curUser : action.payload,
-      //   email: action.email,
-      //   isAuthenticated : true
-      // };
       return {
         ...state,
         token: action.payload.signInUserSession.idToken.jwtToken,
