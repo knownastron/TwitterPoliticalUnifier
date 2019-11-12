@@ -26,7 +26,7 @@ def parse_file_scrape_write(filename, num_tweets, label):
         rate_delay = 5
         error_delay = 5
         max_tweets = num_tweets
-        twit = ts.TwitterSearchImpl(rate_delay, error_delay, max_tweets)
+        twit = ts.TwitterSearchImpl(max_tweets)
 
         #set up database connection
         db_conn = AWSConnection(c.HOST, user=c.USER, port=c.PORT, password=c.PASSWORD, dbname=c.DATABASE_NAME)
@@ -59,7 +59,7 @@ def write_user(db_conn, username_and_id, label):
     print('\twriting user', username_and_id[0])
     username = username_and_id[0].lower()
     user_id = username_and_id[1]
-    db_conn.write_new_user(username, int(user_id), user_id, label, None)
+    db_conn.write_new_user(username, int(user_id), user_id, label, None, )
 
 def write_tweets(db_conn, tweets):
     print('\twriting tweets')
@@ -81,7 +81,7 @@ if __name__  == '__main__':
     label = input("Political label (conservative/liberal): ")
 
     filename = '../text_files/dem_test.txt'
-    num_tweets = 220
+    num_tweets = 200
     label = 'liberal'
 
     parse_file_scrape_write(filename, num_tweets, label)
