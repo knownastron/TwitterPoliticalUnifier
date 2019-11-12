@@ -61,7 +61,7 @@ class SignUp extends React.Component {
     }).then(data => {
       console.log(data);
       if (data === 'SUCCESS') {
-        alert('Email confirmed, redirecting to dashboard');
+        alert('Email confirmed, redirecting to login');
         this.setState({success: true});
       }
 
@@ -72,7 +72,7 @@ class SignUp extends React.Component {
   render() {
     if (this.state.toVerify === false) {
       if (this.state.success) {
-        return (<Redirect to="/" />);
+        return (<Redirect to="/login" />);
       }
       return (
         <div className="component-main-div">
