@@ -19,7 +19,6 @@ keys = json.loads(response.decode('utf-8'))['keys']
 
 def check_jwt(event, context):
     token = event['token']
-    # print(token)
     # get the kid from the headers prior to verification
     headers = jwt.get_unverified_headers(token)
     kid = headers['kid']
@@ -30,7 +29,7 @@ def check_jwt(event, context):
             key_index = i
             break
     if key_index == -1:
-        print('Public key not found in jwks.json')
+        # print('Public key not found in jwks.json')
         return False
     # construct the public key
     public_key = jwk.construct(keys[key_index])
@@ -41,7 +40,7 @@ def check_jwt(event, context):
     decoded_signature = base64url_decode(encoded_signature.encode('utf-8'))
     # verify the signature
     if not public_key.verify(message.encode("utf8"), decoded_signature):
-        print('Signature verification failed')
+        # print('Signature verification failed')
         return False
     print('Signature successfully verified')
     # since we passed the verification, we can now safely
@@ -49,12 +48,12 @@ def check_jwt(event, context):
     claims = jwt.get_unverified_claims(token)
     # additionally we can verify the token expiration
     if time.time() > claims['exp']:
-        print('Token is expired')
+        # print('Token is expired')
         return False
     # and the Audience  (use claims['client_id'] if verifying an access token)
     if claims['aud'] != app_client_id:
-        print('Token was not issued for this audience')
+        # print('Token was not issued for this audience')
         return False
     # now we can use the claims
-    print('Claim results:', claims)
+    # print('Claim results:', claims)
     return claims
