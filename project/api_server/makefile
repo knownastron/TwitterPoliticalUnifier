@@ -3,3 +3,10 @@ start: connect
 
 connect:
 	. venv/bin/activate
+
+celery:
+	cd app/
+	celery -A app.Tasks worker --loglevel=info
+
+redis:
+	sh ./app/run-redis.sh
