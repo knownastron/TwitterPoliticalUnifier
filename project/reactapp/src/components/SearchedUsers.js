@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { connect } from 'react-redux';
 import SearchedUserItem from './SearchedUserItem';
 
 class SearchedUsers extends React.Component {
@@ -11,6 +12,7 @@ class SearchedUsers extends React.Component {
     let self = this;
     axios.post(url, JSON.stringify({
       // 'token': token
+      // 'email': this.props.email
       'email': 'knownastron@gmail.com'
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
     .then(function(response) {
@@ -26,15 +28,28 @@ class SearchedUsers extends React.Component {
     return (
       <div className="component-main-div">
         <h1> Searched Users History </h1>
-        {
-          this.state.users.map((user) => (
-            <SearchedUserItem key={user.id} user={user} />
-            // <h3 key={user.id}> {user.screenName} , {user.searchDate} </h3>
-          ))
-        }
+        <table className="user-table">
+          <tr>
+            <th className='user-th'>Username</th>
+            <th className='user-th'>Date Searched</th>
+            <th className='user-th'>Political Prediction</th>
+          </tr>
+          {
+            this.state.users.map((user) => (
+              <SearchedUserItem key={user.id} user={user} />
+            ))
+          }
+        </ table>
       </div>
     )
   }
 }
 
-export default SearchedUsers;
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated,
+  email: state.auth.email
+})
+
+
+
+export default connect(mapStateToProps, { }) (SearchedUsers);
