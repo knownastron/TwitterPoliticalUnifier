@@ -1,10 +1,7 @@
 import React from 'react';
-// import PropTypes from 'prop-types'
-// import { Auth } from 'aws-amplify';
 import { Redirect } from 'react-router';
 import { connect } from 'react-redux';
 import { loginUser } from '../actions/authActions';
-
 
 
 class Login extends React.Component {
@@ -12,6 +9,7 @@ class Login extends React.Component {
     email: '',
     password: '',
     toConfirm: false,
+    isLoggedIn: false
   };
 
   validateEmail = (email) => {
@@ -29,7 +27,7 @@ class Login extends React.Component {
       password: this.state.password
     }
 
-    this.props.loginUser(loginInfo)
+    this.props.loginUser(loginInfo);
   }
 
   ya = e => {
@@ -39,7 +37,9 @@ class Login extends React.Component {
 
 
   render() {
-    if (!this.state.toConfirm) {
+    if (this.props.isAuthenticated) {
+      return (< Redirect to="/dashboard" />)
+    } else if (!this.state.toConfirm) {
       return (
         <div className="component-main-div">
           <h2> Login </h2>
@@ -63,14 +63,13 @@ class Login extends React.Component {
       );
     } else {
       return (<Redirect to="/verify" />)
-
     }
+
   }
 }
 
 const mapStateToProps = state => ({
-  isAuthenticated: state.auth.isAuthenticated
-  // posts: state.auth.
+  isAuthenticated: state.auth.isAuthenticated,
 })
 
 export default connect(mapStateToProps, { loginUser })(Login);
