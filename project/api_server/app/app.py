@@ -3,9 +3,7 @@ from flask import request, url_for, jsonify, Response
 from flask_api import status
 from flask_cors import CORS
 
-
-
-import os #remove later
+import os  # remove later
 
 import json
 from Services import Format
@@ -16,7 +14,7 @@ from Services import Responses
 from celery import Celery
 import celery
 
-#temp
+# temp
 import time
 import random
 import joblib
@@ -25,14 +23,15 @@ app = Flask(__name__)
 # app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
 # app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 
-#set up CORS
+# set up CORS
 CORS(app)
 
-#Set up Celery
+
+# Set up Celery
 # celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 # celery.conf.update(app.config)
 
-#jobListModel = JobListModel(database credentials, etc.)
+# jobListModel = JobListModel(database credentials, etc.)
 
 
 @app.route('/')
@@ -47,7 +46,7 @@ def longtask():
     print('entered longtask route')
     task = Tasks.long_task.apply_async()
     task.wait()
-    return str(status.HTTP_202_ACCEPTED) # jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
+    return str(status.HTTP_202_ACCEPTED)  # jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
 
 
 @app.route('/api/1.0/labeluser/<username>', methods=['GET', 'OPTIONS'])
@@ -55,16 +54,16 @@ def predictUsername(username):
     return json.dumps({'username': username, 'label': 'conservative'})
 
 
-@app.route('/api/1.0/labeltext', methods = ['POST'])
+@app.route('/api/1.0/labeltext', methods=['POST'])
 def predictText():
     data = request.get_json()
     text = data['text']
 
-    #load svm model
-    nlp_model = open('./NLP_political_classifier.pkl','rb')
+    # load svm model
+    nlp_model = open('./NLP_political_classifier.pkl', 'rb')
     clf = joblib.load(nlp_model)
 
-    #load vectorizer
+    # load vectorizer
     vectorizer_object = open('./tfid_vectorizer.pkl', 'rb')
     vectorizer = joblib.load(vectorizer_object)
 
@@ -72,10 +71,10 @@ def predictText():
     vectorized_text = vectorizer.transform([processed_text])
     prediction = clf.predict(vectorized_text)
 
-    return prediction[0] #data['text']
+    return prediction[0]  # data['text']
 
 
-@app.route('/api/1.0/labeluser', methods = ['POST'])
+@app.route('/api/1.0/labeluser', methods=['POST'])
 def predictUser1():
     data = request.get_json()
     verify = Authentication.check_jwt(data, None)
@@ -96,7 +95,6 @@ def predictUser1():
     tweets = ' '.join(tweets)
 
     processed_text = Format.Format.denoise_tweet(tweets)
-
 
     # load svm model
     nlp_model = open('./NLP_political_classifier.pkl', 'rb')
@@ -125,18 +123,19 @@ def get_searched_users():
     ret = {'searchedUsers': []}
 
     for i, user in enumerate(result):
-        print(user)
+        # print(user)
         ret['searchedUsers'].append({'id': i, 'screenName': user[0], 'searchDate': user[2], 'polLabel': user[5]})
 
     return jsonify(ret)
 
-@app.route('/api/2.0/labeluser', methods = ['POST'])
+
+@app.route('/api/2.0/labeluser', methods=['POST'])
 def predictUser2():
     data = request.get_json()
     # task = Tasks.short_task.delay(data['username'])
     # print(data)
     # verify = Authentication.check_jwt(data, None)
-    verify = True # remove later
+    verify = True  # remove later
     if not verify:
         return auth_error()
 
@@ -147,7 +146,7 @@ def predictUser2():
     return resp
 
 
-@app.route('/api/2.0/createnewuser', methods = ['POST'])
+@app.route('/api/2.0/createnewuser', methods=['POST'])
 def create_new_user():
     # insert check token
     data = request.get_json()
@@ -169,16 +168,18 @@ def labelTweet():
     return 200 OK;
 '''
 
+
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
-            'status': 404,
-            'message': 'Not Found: ' + request.url,
+        'status': 404,
+        'message': 'Not Found: ' + request.url,
     }
     resp = jsonify(message)
     resp.status_code = 404
 
     return resp
+
 
 @app.errorhandler(401)
 def auth_error(error=None):
@@ -191,5 +192,6 @@ def auth_error(error=None):
 
     return resp
 
+
 if __name__ == '__main__':
-   app.run(debug="True", threaded=True)
+    app.run(debug="True", threaded=True)
