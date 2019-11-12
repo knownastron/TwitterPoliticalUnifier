@@ -15,10 +15,7 @@ import urllib.request
 from jose import jwk, jwt
 from jose.utils import base64url_decode
 
-import sys
-sys.path.append('../Config')
-
-import cognito_config
+from Config import cognito_config
 
 region = cognito_config.REGION
 userpool_id = cognito_config.USER_POOL_ID
@@ -33,6 +30,7 @@ keys = json.loads(response.decode('utf-8'))['keys']
 
 def lambda_handler(event, context):
     token = event['token']
+    # print(token)
     # get the kid from the headers prior to verification
     headers = jwt.get_unverified_headers(token)
     kid = headers['kid']
@@ -69,7 +67,7 @@ def lambda_handler(event, context):
         print('Token was not issued for this audience')
         return False
     # now we can use the claims
-    print(claims)
+    print('Claim results:', claims)
     return claims
 
 # the following is useful to make this script executable in both

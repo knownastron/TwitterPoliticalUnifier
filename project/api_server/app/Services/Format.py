@@ -26,8 +26,8 @@ class Format():
 
     @staticmethod
     def format_username(username):
-        if username[0] != '@':
-            return '@' + username
+        if username[0] == '@':
+            return username[1:]
         else:
             return username
 
@@ -73,7 +73,17 @@ class Format():
         return output_text_split
 
     @staticmethod
-    def stem_words(input_text_split):
+    def stem_words_str(input_text):
+        """
+        :param input_text_split: An string of words
+        :return: a string of words
+        """
+        input_text_split = input_text.split()
+        stemmed_output = [Format.stem.stem(word) for word in input_text_split]
+        return ''.join(stemmed_output)
+
+    @staticmethod
+    def stem_words_list(input_text_split):
         """
         :param input_text_split: An array of strings
         :return: an array of strings
