@@ -9,6 +9,7 @@ import Login from './components/Login'
 import SignUp from './components/SignUp'
 import Verify from './components/Verify'
 import Test from './components/Test'
+import SearchedUsers from './components/SearchedUsers'
 import {
   BrowserRouter as Router,
   Switch,
@@ -42,6 +43,9 @@ function App() {
             </Route>
             <Route path="/test">
               <Test/>
+            </Route>
+            <Route path="/dashboard">
+              <SearchedUsers />
             </Route>
           </Switch>
           </div>
