@@ -16,6 +16,26 @@
   width: 80%;
 }
 
+.user-table {
+  margin-top: 30px;
+  border: 1px solid black;
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.user-th {
+  font-family: SFDisplay;
+  border: 1px solid #E0E0E0;
+}
+
+.user-td {
+  font-family: SFDisplay;
+  border: 1px solid #E0E0E0;
+  text-align: left;
+  padding: 10px;
+}
+
 .component-main-div {
   background-color: #FAFAFA;
   /* background-color: red; */
