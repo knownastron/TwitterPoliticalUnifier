@@ -18,10 +18,9 @@ class LabelUser extends React.Component {
     e.preventDefault();
     console.log('yaaaa');
 
-
     if (this.validateEmail(this.state.email)) {
 
-      const url = 'http://127.0.0.1:5000/api/1.0/labeluser';
+      const url = 'http://127.0.0.1:5000/api/2.0/labeluser';
 
       axios.post(url, JSON.stringify({
         ...this.state,
@@ -52,6 +51,7 @@ class LabelUser extends React.Component {
     return (
       <div className="component-main-div">
         <h2> Label User </h2>
+        <p> something something describing this feature</p>
         <form onSubmit={this.submission}>
           <label htmlFor="email">Email</label>
           <input type="text"
