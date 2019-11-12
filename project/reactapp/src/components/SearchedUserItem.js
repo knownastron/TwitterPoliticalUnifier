@@ -14,13 +14,11 @@ class SearchedUserItem extends React.Component {
     let date = new Date(this.props.user.searchDate)
     let formattedDate = formatDate(date)
     return (
-      // <div className='searched-user-item-div'>
         <tr>
           <td className='user-td'><a href={'https://www.twitter.com/' + screen_name} > {'@' + screen_name} </a></td>
           <td className='user-td'>{formattedDate}</td>
           <td className='user-td'>{this.props.user.polLabel}</td>
         </tr>
-      // </div>
     )
   }
 }
