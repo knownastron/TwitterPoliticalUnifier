@@ -196,7 +196,7 @@ class TwitterSearchImpl(TwitterSearch):
         self.max_tweets = max_tweets
         self.counter = 0
         self.saved_tweets = []
-        self.saved_raw_tweets = []
+        self.saved_raw_tweets = [] #just the tweet text
 
     def save_tweets(self, tweets):
         """
