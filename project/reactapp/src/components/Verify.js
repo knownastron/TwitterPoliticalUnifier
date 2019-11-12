@@ -29,7 +29,6 @@ class Verify extends React.Component {
         alert('Email confirmed, redirecting to dashboard');
         this.setState({success: true})
       }
-
     })
     .catch(err => console.log(err));
   }
@@ -74,7 +73,6 @@ class Verify extends React.Component {
             <input type="submit" value="Submit" />
           </form>
           <p>
-
             <button className="link" onClick={this.resendCode}>Resend confirmation code</button>
           </p>
         </div>
