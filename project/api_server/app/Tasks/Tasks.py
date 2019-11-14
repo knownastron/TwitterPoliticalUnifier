@@ -9,11 +9,12 @@ from Database import mysql_aws_credentials
 from Services import TwitterScraper
 from Services import Format
 from Services import TwitterConnection
-
+from multiprocessing import Manager
 
 
 # temp
 import os
+
 
 config = {
     'CELERY_BROKER_URL': 'redis://localhost:6379/0',
@@ -43,17 +44,25 @@ clf = joblib.load(nlp_model)
 vectorizer_object = open('./tfid_vectorizer.pkl', 'rb')
 vectorizer = joblib.load(vectorizer_object)
 
+#set up dictionary of running tasks for each user
+manag = Manager()
+label_user_task_lock = manag.Lock()
+label_user_tasks = manag.dict() # {'email' : ('screen_name', '', 'time_of_search', '', '', 'Pending...')}
+
+
 
 @celery.task(bind=True)
 def long_task(self):
+
     """Background task that runs a long function with progress reports."""
     verb = ['Starting up', 'Booting', 'Repairing', 'Loading', 'Checking']
     adjective = ['master', 'radiant', 'silent', 'harmonic', 'fast']
     noun = ['solar array', 'particle reshaper', 'cosmic ray', 'orbiter', 'bit']
     message = ''
     total = random.randint(10, 50)
-    self.update_state(state='PROGRESS')
+    self.update_state(state='STARTED')
     print('entered long task function')
+
     for i in range(total):
         print(i)
         if not message or random.random() < 0.25:
@@ -71,45 +80,79 @@ def long_task(self):
 
 @celery.task(bind=True)
 def predict_user(self, screen_name, app_user_email):
+    if app_user_email in label_user_tasks:
+        label_user_tasks[app_user_email].append('yuh')
+    else:
+        label_user_tasks[app_user_email] = ['yuh']
 
-    cur_user = aws_conn.get_twitter_user(screen_name)
-    time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    if cur_user:
-        aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
-        return {'status': 'already existed'}
+    print(label_user_tasks)
+    label_user_tasks[app_user_email].remove('yuh')
+    time.sleep(2)
+    print(label_user_tasks)
 
-    user_id = twit_conn.get_user_ids([screen_name])[0][1]
-    print('GOT USER ID', user_id)
-    search_query = "from:" + screen_name
-    twit_scraper.search(search_query)
+    print(label_user_tasks)
 
-    tweets = twit_scraper.get_raw_tweets()
-    tweets_joined = ' '.join(tweets)
-    print('GOT TWEETS')
+    label_user_tasks[app_user_email].remove('yuh')
+    time.sleep(2)
+    print(label_user_tasks)
 
-    cleaned_text = Format.Format.denoise_tweet(tweets_joined)
-    cleaned_text = Format.Format.stem_words_str(cleaned_text)
-    print('CLEANED TWEETS')
-
-    vectorized_text = vectorizer.transform([cleaned_text])
-    prediction = clf.predict(vectorized_text)[0]
-    print('PREDICTED', prediction)
-
-    aws_conn.write_twitter_user(screen_name, int(user_id), user_id, prediction)
-    print('WROTE NEW USER')
-
-    aws_conn.write_tweets(twit_scraper.get_tweets())
-    print('WROTE TWEETS')
-
-    aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
-    print('WROTE SEARCHED')
-    return {'status': 'added new user'}
+    # time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    #
+    # if app_user_email in label_user_tasks:
+    #     label_user_tasks[app_user_email].append((screen_name, time_of_search))
+    # else:
+    #     label_user_tasks[app_user_email] = [(screen_name, time_of_search)]
+    #
+    # time.sleep(10)
+    # cur_user = aws_conn.get_twitter_user(screen_name)
+    #
+    # if cur_user:
+    #     aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+    #     print(label_user_tasks[app_user_email])
+    #     label_user_tasks[app_user_email].remove((screen_name, time_of_search))
+    #     print(label_user_tasks[app_user_email])
+    #     return {'status': 'already existed'}
+    #
+    # user_id = twit_conn.get_user_ids([screen_name])[0][1]
+    # print('GOT USER ID', user_id)
+    # search_query = "from:" + screen_name
+    # twit_scraper.search(search_query)
+    #
+    # tweets = twit_scraper.get_raw_tweets()
+    # tweets_joined = ' '.join(tweets)
+    # print('GOT TWEETS')
+    #
+    # cleaned_text = Format.Format.denoise_tweet(tweets_joined)
+    # cleaned_text = Format.Format.stem_words_str(cleaned_text)
+    # print('CLEANED TWEETS')
+    #
+    # vectorized_text = vectorizer.transform([cleaned_text])
+    # prediction = clf.predict(vectorized_text)[0]
+    # print('PREDICTED', prediction)
+    #
+    # aws_conn.write_twitter_user(screen_name, int(user_id), user_id, prediction)
+    # print('WROTE NEW USER')
+    #
+    # aws_conn.write_tweets(twit_scraper.get_tweets())
+    # print('WROTE TWEETS')
+    #
+    # aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+    # print('WROTE SEARCHED')
+    # label_user_tasks[app_user_email].remove((screen_name, time_of_search))
+    # print('should be empty', label_user_tasks)
+    # return {'status': 'added new user'}
 
 
 @celery.task(bind=True)
 def get_searched_users(self, app_user_email):
     print('entered get_searched_users')
-    searched_users = aws_conn.get_searched_twitter_users(app_user_email)
+    searched_users = []
+    global label_user_tasks
+    print(label_user_tasks)
+    if app_user_email in label_user_tasks:
+        for task in label_user_tasks[app_user_email]:
+            searched_users.append((task[0], None, str(task[1]), None, None, 'Pending...'))
+    searched_users.extend(aws_conn.get_searched_twitter_users(app_user_email))
     return searched_users
 
 
