@@ -2,6 +2,7 @@ import sqlite3
 import pymysql
 from Services import Format
 
+
 class SQLConnection():
     def __init__(self, conn):
         self.conn = conn;
@@ -60,10 +61,12 @@ class SQLConnection():
     def close(self):
         self.conn.close()
 
+
 class LocalConnection(SQLConnection):
     def __init__(self, database_name):
         self.conn = sqlite3.connect(database_name)
         super(LocalConnection, self).__init__(self.conn)
+
 
 class AWSConnection():
     def __init__(self, host, port, dbname, user, password):
@@ -83,7 +86,6 @@ class AWSConnection():
         user = cur.fetchone()
         return user
 
-
     def does_twitter_user_exist(self, screen_name):
         """
         Returns a boolean
@@ -101,7 +103,8 @@ class AWSConnection():
         sql = ''' INSERT IGNORE INTO TwitterUsers(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict, Test)
               VALUES(%s, %s, %s, %s, %s, %s) '''
         cur = self.conn.cursor()
-        cur.execute(sql, (Format.Format.format_username(screen_name), user_id, user_id_str, pol_label, pol_label_pred, test))
+        cur.execute(sql,
+                    (Format.Format.format_username(screen_name), user_id, user_id_str, pol_label, pol_label_pred, test))
         self.conn.commit()
 
     def get_users_by_pol_label(self, pol_label):
@@ -128,7 +131,9 @@ class AWSConnection():
         cur = self.conn.cursor()
         cur._defer_warnings = True
         for tweet in tweets:
-            cur.execute(sql, (tweet['tweet_id'], tweet['text'], Format.format_username(tweet['user_screen_name']), tweet['created_at']))
+            cur.execute(sql, (
+            tweet['tweet_id'], tweet['text'], Format.Format.format_username(tweet['user_screen_name']),
+            tweet['created_at']))
         self.conn.commit()
 
     def write_tweets_temp(self, tweets):
@@ -164,10 +169,10 @@ class AWSConnection():
         count = cur.fetchone()
         return count[0]
 
-
     '''
     UserProfile Methods
     '''
+
     def create_user_profile(self, email):
         sql = "INSERT IGNORE INTO UserProfiles SET Email = %s"
         cur = self.conn.cursor()
@@ -177,22 +182,22 @@ class AWSConnection():
     '''
     SearchedTwitterUsers Methods
     '''
+
     def get_searched_twitter_users(self, email):
         """
-
         :param email: email of User Profile that searched tweets
         :return: a tuple of (email, screen_name)
         """
         sql = "SELECT * from SearchedTwitterUsers NATURAL JOIN TwitterUsers where Email = %s ORDER BY SearchDate DESC"
         cur = self.conn.cursor()
-        cur.execute(sql, (email, ))
+        cur.execute(sql, (email,))
         twitter_users = cur.fetchall()
         return twitter_users
 
     def insert_searched_twitter_user(self, email, screen_name, searched_date):
         sql = "INSERT IGNORE INTO SearchedTwitterUsers (Email, ScreenName, SearchDate) VALUES (%s, %s, %s)"
         cur = self.conn.cursor()
-        cur.execute(sql, (email, screen_name, searched_date, ))
+        cur.execute(sql, (email, screen_name, searched_date,))
         self.conn.commit()
 
     def close(self):
