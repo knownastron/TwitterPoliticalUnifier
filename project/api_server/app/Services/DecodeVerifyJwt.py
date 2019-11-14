@@ -25,8 +25,9 @@ keys_url = 'https://cognito-idp.{}.amazonaws.com/{}/.well-known/jwks.json'.forma
 # we download them only on cold start
 # https://aws.amazon.com/blogs/compute/container-reuse-in-lambda/
 with urllib.request.urlopen(keys_url) as f:
-  response = f.read()
+    response = f.read()
 keys = json.loads(response.decode('utf-8'))['keys']
+
 
 def lambda_handler(event, context):
     token = event['token']
@@ -70,9 +71,11 @@ def lambda_handler(event, context):
     print('Claim results:', claims)
     return claims
 
+
 # the following is useful to make this script executable in both
 # AWS Lambda and any other local environments
 if __name__ == '__main__':
     # for testing locally you can enter the JWT ID Token here
-    event = {'token': 'eyJraWQiOiJtdm90Y2JlWks3TWdyNFJqWEJoT2RWMDhRakNnYnZWbFdTczIzanRZeW5vPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMTVlM2UyYS1kOGNhLTQ5YzMtOTg5Yi1jMzc1OGZlZjg1MWIiLCJhdWQiOiJlMHNwY3NqZDI2aWY0bW1lMTM0aXI1anFxIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV2ZW50X2lkIjoiMjVmYmU0NzEtNDE3Yy00MDBkLWExZGEtZmMwYjdhNmQxOGU0IiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE1NzI5Mzc4NTYsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbVwvdXMtd2VzdC0yX3NObVBOOTVETCIsImNvZ25pdG86dXNlcm5hbWUiOiJmMTVlM2UyYS1kOGNhLTQ5YzMtOTg5Yi1jMzc1OGZlZjg1MWIiLCJleHAiOjE1NzI5NDE0NTYsImlhdCI6MTU3MjkzNzg1NiwiZW1haWwiOiJrbm93bmFzdHJvbkBnbWFpbC5jb20ifQ.PtAGF_fCltR7smt8StvbSFt5IiN6iZ-wcoV-d8r4wpdpHFsklHansH3vN0KkGFZh0juVBFG4NoJEqtRdpnBHwnjcWH6l1BRtSenzT6E1Q2I6nk17R9CDahuOQfkl9Kj2In8-T6lZrnho5mWsVh3tlCzB8kpUV9HSPXXtzNNrdi3TNtvqz8TNFmypBoSlY4_zMctmRdLURlv12IbS5_xO1NIY8RdlBQvVKVqn7_o5WxgbBOZWnHDaYYtS6Yk4UCeTWIKg8m-6OFyuJMgblUBEO45fvwv2DivH-0nnJYFh_fDSY0P0Q6Jc3JF4ALBeChmMJ3_BkWPYxO7PVCFwHcrArw'}
+    event = {
+        'token': 'eyJraWQiOiJtdm90Y2JlWks3TWdyNFJqWEJoT2RWMDhRakNnYnZWbFdTczIzanRZeW5vPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMTVlM2UyYS1kOGNhLTQ5YzMtOTg5Yi1jMzc1OGZlZjg1MWIiLCJhdWQiOiJlMHNwY3NqZDI2aWY0bW1lMTM0aXI1anFxIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV2ZW50X2lkIjoiMjVmYmU0NzEtNDE3Yy00MDBkLWExZGEtZmMwYjdhNmQxOGU0IiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE1NzI5Mzc4NTYsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbVwvdXMtd2VzdC0yX3NObVBOOTVETCIsImNvZ25pdG86dXNlcm5hbWUiOiJmMTVlM2UyYS1kOGNhLTQ5YzMtOTg5Yi1jMzc1OGZlZjg1MWIiLCJleHAiOjE1NzI5NDE0NTYsImlhdCI6MTU3MjkzNzg1NiwiZW1haWwiOiJrbm93bmFzdHJvbkBnbWFpbC5jb20ifQ.PtAGF_fCltR7smt8StvbSFt5IiN6iZ-wcoV-d8r4wpdpHFsklHansH3vN0KkGFZh0juVBFG4NoJEqtRdpnBHwnjcWH6l1BRtSenzT6E1Q2I6nk17R9CDahuOQfkl9Kj2In8-T6lZrnho5mWsVh3tlCzB8kpUV9HSPXXtzNNrdi3TNtvqz8TNFmypBoSlY4_zMctmRdLURlv12IbS5_xO1NIY8RdlBQvVKVqn7_o5WxgbBOZWnHDaYYtS6Yk4UCeTWIKg8m-6OFyuJMgblUBEO45fvwv2DivH-0nnJYFh_fDSY0P0Q6Jc3JF4ALBeChmMJ3_BkWPYxO7PVCFwHcrArw'}
     lambda_handler(event, None)
