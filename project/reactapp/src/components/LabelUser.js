@@ -16,7 +16,6 @@ class LabelUser extends React.Component {
   submission = (e) => {
     let token = this.props.token;
     e.preventDefault();
-    console.log('yaaaa');
 
     if (this.validateEmail(this.state.email)) {
 
@@ -44,7 +43,11 @@ class LabelUser extends React.Component {
   }
 
   usernameChange = (e) => {
-    this.setState({username: e.target.value});
+    let new_username = e.target.value;
+    if (new_username.charAt(0) === '@') {
+      new_username = new_username.slice(1)
+    }
+    this.setState({username: new_username});
   }
 
   render() {
@@ -58,15 +61,13 @@ class LabelUser extends React.Component {
             id="emailInput"
             name="email"
             placeholder="Email Address"
-            onBlur={this.emailChange}/>
-
+            onChange={this.emailChange}/>
           <label htmlFor="username">Twitter Username</label>
           <input type="text"
             id="username"
             name="tweeturl"
-            placeholder="Twitter handle"
-            onBlur={this.usernameChange}/>
-
+            placeholder="ex) @realdonaldtrump"
+            onChange={this.usernameChange}/>
           <input type="submit" value="Submit" />
         </form>
       </div>
