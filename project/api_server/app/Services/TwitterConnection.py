@@ -7,7 +7,6 @@ from tweepy import OAuthHandler
 from tweepy import Cursor
 from tweepy import RateLimitError
 from Services import Format
-
 from Services import twitter_credentials
 
 
@@ -43,8 +42,6 @@ class TwitterConnection:
         self.auth = OAuthHandler(twitter_credentials.CONSUMER_KEY, twitter_credentials.CONSUMER_SECRET)
         self.auth.set_access_token(twitter_credentials.ACCESS_TOKEN, twitter_credentials.ACCESS_TOKEN_SECRET)
         self.api = API(self.auth)
-
-
 
     def get_text_of_tweet(self, username, num_tweets, print_progress=False):
         """
