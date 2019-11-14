@@ -18,10 +18,12 @@ import celery
 import time
 import random
 import joblib
+from celery.task.control import inspect
 
 app = Flask(__name__)
 # app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
 # app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
 
 # set up CORS
 CORS(app)
@@ -109,6 +111,20 @@ def predictUser1():
     return {'username': username, 'politicalLabel': prediction[0]}
 
 
+@app.route('/api/2.0/test', methods=['POST'])
+def test_2():
+    result = Tasks.long_task.apply_async()
+    print(result.id)
+    return result.id
+
+@app.route('/api/2.0/test2', methods=['POST'])
+def test_3():
+    data = request.get_json()
+    task = Tasks.long_task.AsyncResult(data['id'])
+    print(data['id'])
+    task.ready()
+    return '202 ' + str(task.state)
+
 @app.route('/api/2.0/getsearchedusers', methods=['POST'])
 def get_searched_users():
     data = request.get_json()
@@ -142,7 +158,7 @@ def predictUser2():
     task = Tasks.predict_user.apply_async([data['username'], data['email']])
     # task.wait()
 
-    resp = {'status_code': 401}
+    resp = {'status_code': 401, 'task_id': task.id}
     return resp
 
 
