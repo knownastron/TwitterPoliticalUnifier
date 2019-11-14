@@ -21,7 +21,6 @@ __author__ = 'Tom Dickinson'
 
 
 class TwitterSearch(object):
-
     __meta__ = ABCMeta
 
     def __init__(self, rate_delay, error_delay=5):
@@ -136,7 +135,7 @@ class TwitterSearch(object):
             # Tweet date
             date_span = li.find("span", class_="_timestamp")
             if date_span is not None:
-                t = datetime.datetime.fromtimestamp((float(date_span['data-time-ms'])/1000))
+                t = datetime.datetime.fromtimestamp((float(date_span['data-time-ms']) / 1000))
                 fmt = "%Y-%m-%d %H:%M:%S"
                 tweet['created_at'] = t.strftime(fmt)
 
@@ -196,7 +195,7 @@ class TwitterSearchImpl(TwitterSearch):
         self.max_tweets = max_tweets
         self.counter = 0
         self.saved_tweets = []
-        self.saved_raw_tweets = [] #just the tweet text
+        self.saved_raw_tweets = []  # just the tweet text
 
     def save_tweets(self, tweets):
         """
@@ -345,7 +344,7 @@ if __name__ == '__main__':
     rate_delay_seconds = 0
     error_delay_seconds = 5
 
-#    Example of using TwitterSearch
+    #    Example of using TwitterSearch
     twit = TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, None)
     twit.search(search_query)
     tweets = twit.get_tweets()
@@ -365,4 +364,4 @@ if __name__ == '__main__':
         print(tweet)
 
     print("TwitterSearch collected %i" % twit.counter)
-    #print("TwitterSlicer collected %i" % twitSlice.counter)
+    # print("TwitterSlicer collected %i" % twitSlice.counter)
