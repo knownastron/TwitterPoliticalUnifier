@@ -20,6 +20,7 @@ import random
 import joblib
 from celery.task.control import inspect
 
+
 app = Flask(__name__)
 # app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
 # app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
@@ -139,7 +140,7 @@ def get_searched_users():
     ret = {'searchedUsers': []}
 
     for i, user in enumerate(result):
-        # print(user)
+        print(user)
         ret['searchedUsers'].append({'id': i, 'screenName': user[0], 'searchDate': user[2], 'polLabel': user[5]})
 
     return jsonify(ret)
