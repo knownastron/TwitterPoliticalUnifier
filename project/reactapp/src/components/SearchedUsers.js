@@ -29,16 +29,18 @@ class SearchedUsers extends React.Component {
       <div className="component-main-div">
         <h1> Searched Users History </h1>
         <table className="user-table">
-          <tr>
-            <th className='user-th'>Username</th>
-            <th className='user-th'>Date Searched</th>
-            <th className='user-th'>Political Prediction</th>
-          </tr>
-          {
-            this.state.users.map((user) => (
-              <SearchedUserItem key={user.id} user={user} />
-            ))
-          }
+            <tbody>
+              <tr>
+                <th className='user-th'>Username</th>
+                <th className='user-th'>Date Searched</th>
+                <th className='user-th'>Political Prediction</th>
+              </tr>
+              {
+                this.state.users.map((user) => (
+                  <SearchedUserItem key={user.id} user={user} />
+                ))
+              }
+          </tbody>
         </ table>
       </div>
     )
