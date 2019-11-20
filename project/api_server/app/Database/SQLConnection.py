@@ -58,6 +58,13 @@ class SQLConnection():
         users = cur.fetchall()
         return users
 
+    def get_all_users(self):
+        sql = "SELECT * FROM Users"
+        cur = self.conn.cursor()
+        cur.execute(sql)
+        users = cur.fetchall()
+        return users
+
     def close(self):
         self.conn.close()
 
@@ -96,15 +103,15 @@ class AWSConnection():
         does_exist = cur.fetchone()
         return bool(does_exist[0])
 
-    def write_twitter_user(self, screen_name, user_id, user_id_str, pol_label, pol_label_pred=None, test=0):
+    def write_twitter_user(self, screen_name, user_id, user_id_str, pol_label, location, test=0):
         """
         Requires 6 items
         """
-        sql = ''' INSERT IGNORE INTO TwitterUsers(ScreenName, UserId, UserIdStr, PolLabel, PolLabelPredict, Test)
+        sql = ''' INSERT IGNORE INTO TwitterUsers(ScreenName, UserId, UserIdStr, PolLabel, Location, Test)
               VALUES(%s, %s, %s, %s, %s, %s) '''
         cur = self.conn.cursor()
         cur.execute(sql,
-                    (Format.Format.format_username(screen_name), user_id, user_id_str, pol_label, pol_label_pred, test))
+                    (Format.Format.format_username(screen_name), user_id, user_id_str, pol_label, location, test))
         self.conn.commit()
 
     def get_users_by_pol_label(self, pol_label):
@@ -113,6 +120,12 @@ class AWSConnection():
         cur.execute(sql, (pol_label,))
         users = cur.fetchall()
         return users
+
+    def update_location(self, screen_name, location):
+        sql = "Update TwitterUsers SET Location = %s WHERE ScreenName = %s"
+        cur = self.conn.cursor()
+        cur.execute(sql, (location, screen_name, ))
+        self.conn.commit()
 
     '''
     Tweets Methods
@@ -199,6 +212,52 @@ class AWSConnection():
         cur = self.conn.cursor()
         cur.execute(sql, (email, screen_name, searched_date,))
         self.conn.commit()
+
+    '''
+    SearchedTweets Methods
+    '''
+
+    def get_searched_tweets(self, email):
+        """
+        :param email:
+        :return:
+        """
+        sql = "SELECT * from SearchedTweets NATURAL JOIN Tweets where Email = %s ORDER BY SearchDate DESC"
+        cur = self.conn.cursor()
+        cur.execute(sql, (email,))
+        searched_tweets = cur.fetchall()
+        return searched_tweets
+
+    def insert_searched_tweet(self, email, tweet_id, search_date):
+        """
+        :param email:
+        :param tweet_id:
+        :param search_date:
+        :return:
+        """
+        sql = "INSERT IGNORE INTO SearchedTweets (Email, TweetId, SearchDate) VALUES (%s, %s, %s)"
+        cur = self.conn.cursor()
+        cur.execute(sql, (email, tweet_id, search_date,))
+        self.conn.commit()
+
+    '''
+    TweetLike Methods
+    '''
+
+    def insert_tweet_likes(self, screen_name, tweet_id):
+        sql = "INSERT IGNORE INTO TweetLikes (ScreenName, TweetId) VALUES (%s, %s)"
+        cur = self.conn.cursor()
+        cur.execute(sql, (screen_name, tweet_id))
+        self.conn.commit()
+
+    def get_screen_name_from_tweet_likes(self, tweet_id):
+        sql = "SELECT ScreenName FROM TweetLikes where TweetId = %s"
+        cur = self.conn.cursor()
+        cur.execute(sql, (tweet_id,))
+        screen_names = cur.fetchall()
+        return screen_names
+
+
 
     def close(self):
         self.conn.close()
