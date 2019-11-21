@@ -112,6 +112,7 @@ def predictUser1():
     return {'username': username, 'politicalLabel': prediction[0]}
 
 
+
 @app.route('/api/2.0/test', methods=['POST'])
 def test_2():
     result = Tasks.long_task.apply_async()
@@ -141,8 +142,11 @@ def get_searched_users():
 
     for i, user in enumerate(result):
         print(user)
-        ret['searchedUsers'].append({'id': i, 'screenName': user[0], 'searchDate': user[2], 'polLabel': user[5]})
-
+        ret['searchedUsers'].append({'id': i,
+                                     'screenName': user[0],
+                                     'searchDate': user[2],
+                                     'polLabel': user[5],
+                                     'location': user[7]})
     return jsonify(ret)
 
 
@@ -162,6 +166,16 @@ def predictUser2():
     resp = {'status_code': 401, 'task_id': task.id}
     return resp
 
+@app.route('/api/2.0/labeltweet', methods=['POST'])
+def predictTweet2():
+    data = request.get_json()
+    verify = True
+    if not verify:
+        return auth_error()
+    task = Tasks.predict_tweet.apply_async([data['email'], data['tweetId']])
+    task.wait()
+    return '202'
+
 
 @app.route('/api/2.0/createnewuser', methods=['POST'])
 def create_new_user():
@@ -175,15 +189,7 @@ def create_new_user():
     return resp
 
 
-'''
-@app.route('/labelTweet', methods=['POST'])
-def labelTweet():
-    # recover user id, tweet id, etc.
-    # get calling user from their session
-    global jobListModel
-    jobListModel.labelTweet(current_user, twitter_user_id, tweet_id)
-    return 200 OK;
-'''
+
 
 
 @app.errorhandler(404)
