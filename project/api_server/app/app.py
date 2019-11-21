@@ -176,6 +176,36 @@ def predictTweet2():
     task.wait()
     return '202'
 
+@app.route('/api/2.0/getsearchedtweets', methods=['POST'])
+def get_searched_tweets():
+    data = request.get_json()
+    verify = True
+    if not verify:
+        return auth_error()
+    task = Tasks.get_searched_tweets.apply_async([data['email']])
+    task.wait()
+
+    result = task.result
+    print(result)
+    ret = {'searchedTweets': []}
+    for i, tweet in enumerate(result):
+        print(tweet)
+        if len(tweet) == 6: #in progress tweets have an extra variable
+            ret['searchedTweets'].append({'id': i,
+                                          'tweetId': tweet[1],
+                                          'screenName': tweet[2],
+                                          'text': tweet[3],
+                                          'searchDate': tweet[4],
+                                          'inProgress': True})
+        else:
+            ret['searchedTweets'].append({'id': i,
+                                          'tweetId': tweet[1],
+                                          'screenName': tweet[2],
+                                          'text': tweet[3],
+                                          'searchDate': tweet[4],
+                                          'inProgress': False})
+    return ret
+
 
 @app.route('/api/2.0/createnewuser', methods=['POST'])
 def create_new_user():
@@ -187,10 +217,6 @@ def create_new_user():
 
     resp = {'status_code': 200}
     return resp
-
-
-
-
 
 @app.errorhandler(404)
 def not_found(error=None):
