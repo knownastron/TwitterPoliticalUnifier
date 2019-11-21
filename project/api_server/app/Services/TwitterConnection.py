@@ -45,13 +45,17 @@ class TwitterConnection:
 
     def get_tweet(self, tweet_id):
         """
-        Returns the Tweet Id, text, screen name, date created
+        Returns the a dict with keys screen_name, id, text, created_at
 
         :param tweet_id: an int
         :return: a tweepy Status object
         """
         status = self.api.get_status(tweet_id)
-        return status.id, status.author.screen_name.lower(), status.text, status.created_at
+        status_dict = {'screen_name': status.author.screen_name.lower(),
+                       'id': status.id,
+                       'text': status.text,
+                       'created_at': status.created_at}
+        return status_dict
 
     def get_text_of_tweet(self, username, num_tweets, print_progress=False):
         """
