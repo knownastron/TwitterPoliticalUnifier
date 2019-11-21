@@ -22,8 +22,7 @@ class SQLConnection():
         self.conn.commit()
 
     def write_tweets(self, tweets):
-        sql = ''' INSERT OR IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
-              VALUES(?, ?, ?, ?)'''
+        sql = ''' INSERT OR IGNORE INTO Tweets(TweetId, Text, ScreenName, Date) VALUES(?, ?, ?, ?)'''
         cur = self.conn.cursor()
         for tweet in tweets:
             tweet_text = tweet['text']
@@ -217,7 +216,7 @@ class AWSConnection():
     SearchedTweets Methods
     '''
 
-    def get_searched_tweets(self, email):
+    def get_searched_tweets_by_email(self, email):
         """
         :param email:
         :return:
@@ -228,27 +227,52 @@ class AWSConnection():
         searched_tweets = cur.fetchall()
         return searched_tweets
 
-    def insert_searched_tweet(self, email, tweet_id, search_date):
+    def get_searched_tweet_by_id(self, tweet_id):
+        sql = "SELECT * from SearchedTweets where TweetId = %s"
+        cur = self.conn.cursor()
+        cur.execute(sql, (tweet_id,))
+        searched_tweets = cur.fetchone()
+        return searched_tweets
+
+    def does_searched_tweet_exist(self, tweet_id):
+        sql = "SELECT * from SearchedTweets where TweetId = %s"
+        cur = self.conn.cursor()
+        cur.execute(sql, (tweet_id,))
+        searched_tweet = cur.fetchone()
+        return False if searched_tweet is None else searched_tweet
+
+    def insert_searched_tweet(self, email, tweet_id, screen_name, tweet_text, search_date):
         """
+
         :param email:
         :param tweet_id:
+        :param screen_name:
+        :param tweet_text:
         :param search_date:
         :return:
         """
-        sql = "INSERT IGNORE INTO SearchedTweets (Email, TweetId, SearchDate) VALUES (%s, %s, %s)"
+        sql = '''INSERT IGNORE INTO SearchedTweets (Email, TweetId, ScreenName, Text, SearchDate)
+              VALUES (%s, %s, %s, %s, %s)'''
         cur = self.conn.cursor()
-        cur.execute(sql, (email, tweet_id, search_date,))
+        cur.execute(sql, (email, tweet_id, screen_name, tweet_text, search_date,))
         self.conn.commit()
 
     '''
-    TweetLike Methods
+    TweetLikes Methods
     '''
 
-    def insert_tweet_likes(self, screen_name, tweet_id):
+    def insert_tweet_likes(self, screen_names, tweet_id):
+        """
+        :param screen_names: a list of screen names
+        :param tweet_id:
+        :return:
+        """
         sql = "INSERT IGNORE INTO TweetLikes (ScreenName, TweetId) VALUES (%s, %s)"
         cur = self.conn.cursor()
-        cur.execute(sql, (screen_name, tweet_id))
+        for screen_name in screen_names:
+            cur.execute(sql, (screen_name, tweet_id))
         self.conn.commit()
+
 
     def get_screen_name_from_tweet_likes(self, tweet_id):
         sql = "SELECT ScreenName FROM TweetLikes where TweetId = %s"
@@ -256,6 +280,7 @@ class AWSConnection():
         cur.execute(sql, (tweet_id,))
         screen_names = cur.fetchall()
         return screen_names
+
 
 
 
