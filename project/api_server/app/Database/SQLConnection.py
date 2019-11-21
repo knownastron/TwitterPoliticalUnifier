@@ -221,7 +221,7 @@ class AWSConnection():
         :param email:
         :return:
         """
-        sql = "SELECT * from SearchedTweets NATURAL JOIN Tweets where Email = %s ORDER BY SearchDate DESC"
+        sql = "SELECT * from SearchedTweets where Email = %s ORDER BY SearchDate DESC"
         cur = self.conn.cursor()
         cur.execute(sql, (email,))
         searched_tweets = cur.fetchall()
