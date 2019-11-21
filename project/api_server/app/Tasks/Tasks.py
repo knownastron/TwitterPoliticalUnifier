@@ -45,11 +45,11 @@ vectorizer = joblib.load(vectorizer_object)
 # set up dictionary of running tasks for each user
 multiprocessing_manager = Manager()
 label_user_task_lock = multiprocessing_manager.Lock()
-label_user_tasks = multiprocessing_manager.dict()  # {'email' : ('screen_name', 'time_of_search)}
+running_user_tasks = multiprocessing_manager.dict()  # {'email' : ('screen_name', 'time_of_search)}
 
 # set up dictionary of running task for each tweet
 label_tweet_task_lock = multiprocessing_manager.Lock()
-label_tweet_tasks = multiprocessing_manager.dict()  # {'email' : (tweet_id, time_of_search)}
+running_tweet_tasks = multiprocessing_manager.dict()  # {'email' : (tweet_id, time_of_search)}
 
 
 @celery.task(bind=True)
@@ -79,64 +79,69 @@ def long_task(self):
 
 
 @celery.task(bind=True)
+def create_new_user(self, email):
+    aws_conn.create_user_profile(email)
+    return
+
+
+@celery.task(bind=True)
 def predict_user(self, screen_name, app_user_email):
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     with label_user_task_lock:
-        if app_user_email in label_user_tasks:
+        if app_user_email in running_user_tasks:
             print('email in task list')
-            print(label_user_tasks[app_user_email])
-            for (cur_screen_name, cur_time) in label_user_tasks[app_user_email]:
+            print(running_user_tasks[app_user_email])
+            for (cur_screen_name, cur_time) in running_user_tasks[app_user_email]:
                 if cur_screen_name == screen_name:
                     return {'status': 'already in progress'}
             print('appending')
             add_label_user_task_to_queue(app_user_email, screen_name, time_of_search)
 
         else:
-            label_user_tasks[app_user_email] = [(screen_name, time_of_search)]
-
-    # label_user_task_lock.release()
-    time.sleep(10)
-    cur_user = aws_conn.get_twitter_user(screen_name)
-
-    if cur_user:
-        aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
-        remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search)
-        return {'status': 'user already scraped'}
-
+            running_user_tasks[app_user_email] = [(screen_name, time_of_search)]
     try:
-        user_id = twit_conn.get_user_ids([screen_name])[0][1]
-        print('GOT USER ID', user_id)
-        search_query = "from:" + screen_name
-        twit_scraper.search(search_query)
+        # label_user_task_lock.release()
+        time.sleep(10)
+        cur_user = aws_conn.get_twitter_user(screen_name)
 
-        tweets = twit_scraper.get_tweets()
-        raw_tweets = twit_scraper.get_raw_tweets()
-        tweets_joined = ' '.join(raw_tweets)
-        print('GOT TWEETS')
+        if cur_user:
+            aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+            remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search)
+            return {'status': 'user already scraped'}
 
-        cleaned_text = Format.Format.denoise_tweet(tweets_joined)
-        cleaned_text = Format.Format.stem_words_str(cleaned_text)
-        print('CLEANED TWEETS')
+        try:
+            user_id = twit_conn.get_user_ids([screen_name])[0][1]
+            print('GOT USER ID', user_id)
+            search_query = "from:" + screen_name
+            twit_scraper.search(search_query)
 
-        vectorized_text = vectorizer.transform([cleaned_text])
-        prediction = clf.predict(vectorized_text)[0]
-        print('PREDICTED', prediction)
+            tweets = twit_scraper.get_tweets()
+            raw_tweets = twit_scraper.get_raw_tweets()
+            tweets_joined = ' '.join(raw_tweets)
+            print('GOT TWEETS')
 
-        aws_conn.write_twitter_user(screen_name, int(user_id), user_id, prediction)
-        print('WROTE NEW USER')
+            cleaned_text = Format.Format.denoise_tweet(tweets_joined)
+            cleaned_text = Format.Format.stem_words_str(cleaned_text)
+            print('CLEANED TWEETS')
 
-        aws_conn.write_tweets(tweets)
-        print('WROTE TWEETS')
+            vectorized_text = vectorizer.transform([cleaned_text])
+            prediction = clf.predict(vectorized_text)[0]
+            print('PREDICTED', prediction)
 
-        aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
-        print('WROTE SEARCHED')
+            aws_conn.write_twitter_user(screen_name, int(user_id), user_id, prediction)
+            print('WROTE NEW USER')
 
+            aws_conn.write_tweets(tweets)
+            print('WROTE TWEETS')
+
+            aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+            print('WROTE SEARCHED')
+        finally:
+            twit_scraper.clear_tweets()
+    finally:
         # removes the current task from the user tasks
         remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search)
-    finally:
-        twit_scraper.clear_tweets()
-
     return {'status': 'added new user'}
 
 
@@ -144,10 +149,10 @@ def predict_user(self, screen_name, app_user_email):
 def get_searched_users(self, app_user_email):
     print('entered get_searched_users')
     searched_users = []
-    global label_user_tasks
-    print(label_user_tasks)
-    if app_user_email in label_user_tasks:
-        for task in label_user_tasks[app_user_email]:
+    global running_user_tasks
+    print(running_user_tasks)
+    if app_user_email in running_user_tasks:
+        for task in running_user_tasks[app_user_email]:
             searched_users.append((task[0], None, str(task[1]), None, None, 'Pending...'))
     searched_users.extend(aws_conn.get_searched_twitter_users(app_user_email))
     print(searched_users)
@@ -155,99 +160,80 @@ def get_searched_users(self, app_user_email):
 
 
 @celery.task(bind=True)
-def create_new_user(self, email):
-    aws_conn.create_user_profile(email)
-    return
-
-
-@celery.task(bind=True)
 def predict_tweet(self, app_user_email, tweet_id):
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    # if tweet search already in progress
-    with label_tweet_task_lock:
-        if app_user_email in label_tweet_tasks:
-            print('email in task list')
-            print(label_tweet_tasks[app_user_email])
-            for (cur_screen_name, cur_tweet_id, cur_time) in label_user_tasks[app_user_email]:
-                if cur_tweet_id == tweet_id:
-                    return {'status': 'already in progress'}
-            print('appending tweet to task list')
-            add_label_user_task_to_queue(app_user_email, screen_name, tweet_id, time_of_search)
-
-
-    # checks if tweet has already been searched and predicted before
-    previous_tweet = aws_conn.get_searched_tweet_by_id(tweet_id) #status or False
-
-    if previous_tweet is not None:
-        aws_conn.insert_searched_tweet(app_user_email, previous_tweet[1], previous_tweet[2], previous_tweet[3], time_of_search)
-        return {'status': 'tweet already searched'}
 
     # from this point on use status
     status = twit_conn.get_tweet(tweet_id)
     print('GOT STATUS', status)
 
-
-    #############################
-    likers = twit_conn.get_liked_list(tweet_id)
-    likers = ['aoc', 'realdonaldtrump', 'itsleelz']
-    #############################
-
-    user_objects_likers = twit_conn.get_user_objects(likers)
-    print('len users', len(user_objects_likers))
-    for liker in user_objects_likers:
-        if aws_conn.get_twitter_user(liker.screen_name.lower()) is None:
-            try:
-                print('SCRAPING', liker.screen_name.lower())
-                search_query = "from:" + liker.screen_name.lower()
-                twit_scraper.search(search_query)
-
-                tweets = twit_scraper.get_tweets()
-                raw_tweets = twit_scraper.get_raw_tweets()
-                tweets_joined = ' '.join(raw_tweets)
-                print('GOT TWEETS')
-
-                cleaned_text = Format.Format.denoise_tweet(tweets_joined)
-                cleaned_text = Format.Format.stem_words_str(cleaned_text)
-                print('CLEANED TWEETS')
-
-                vectorized_text = vectorizer.transform([cleaned_text])
-                prediction = clf.predict(vectorized_text)[0]
-                print('PREDICTED', prediction)
-
-                aws_conn.write_twitter_user(liker.screen_name.lower(), liker.id, liker.id_str, prediction, liker.location)
-                print('WROTE NEW USER')
-
-                aws_conn.write_tweets(tweets)
-                print('WROTE TWEETS')
-            finally:
-                twit_scraper.clear_tweets()
+    # if tweet search already in progress
+    with label_tweet_task_lock:
+        if app_user_email in running_tweet_tasks:
+            print('email in task list')
+            print(running_tweet_tasks[app_user_email])
+            for (cur_screen_name, cur_tweet_id, cur_time) in running_tweet_tasks[app_user_email]:
+                if cur_tweet_id == status['id']:
+                    return {'status': 'already in progress'}
+            print('appending tweet to task list')
+            add_tweet_to_running_tasks(app_user_email, status['screen_name'], status['id'], time_of_search)
         else:
-            print('skipped!')
-            continue
-    aws_conn.insert_searched_tweet(app_user_email, status[0], status[1], status[2], time_of_search)
-    aws_conn.insert_tweet_likes(likers, tweet_id)
+            print('adding email to label tweet tasks')
+            running_tweet_tasks[app_user_email] = [(status['screen_name'], status['id'], time_of_search)]
+
+    print(running_tweet_tasks)
+    time.sleep(10)
+    try:
+        # checks if tweet has already been searched and predicted before
+        previous_tweet = aws_conn.get_searched_tweet_by_id(tweet_id) #status or False
+
+        if previous_tweet is not None:
+            aws_conn.insert_searched_tweet(app_user_email, previous_tweet[1], previous_tweet[2], previous_tweet[3], time_of_search)
+            return {'status': 'tweet already searched'}
+
+        #############################
+        likers = twit_conn.get_liked_list(tweet_id)
+        # likers = ['aoc', 'realdonaldtrump', 'itsleelz']
+        #############################
+
+        user_objects_likers = twit_conn.get_user_objects(likers)
+        print('len users', len(user_objects_likers))
+        for liker in user_objects_likers:
+            if aws_conn.get_twitter_user(liker.screen_name.lower()) is None:
+                try:
+                    print('SCRAPING', liker.screen_name.lower())
+                    search_query = "from:" + liker.screen_name.lower()
+                    twit_scraper.search(search_query)
+
+                    tweets = twit_scraper.get_tweets()
+                    raw_tweets = twit_scraper.get_raw_tweets()
+                    tweets_joined = ' '.join(raw_tweets)
+                    print('GOT TWEETS')
+
+                    cleaned_text = Format.Format.denoise_tweet(tweets_joined)
+                    cleaned_text = Format.Format.stem_words_str(cleaned_text)
+                    print('CLEANED TWEETS')
+
+                    vectorized_text = vectorizer.transform([cleaned_text])
+                    prediction = clf.predict(vectorized_text)[0]
+                    print('PREDICTED', prediction)
+
+                    aws_conn.write_twitter_user(liker.screen_name.lower(), liker.id, liker.id_str, prediction, liker.location)
+                    print('WROTE NEW USER')
+
+                    aws_conn.write_tweets(tweets)
+                    print('WROTE TWEETS')
+                finally:
+                    twit_scraper.clear_tweets()
+            else:
+                print('skipped!')
+                continue
+        aws_conn.insert_searched_tweet(app_user_email, status['id'], status['screen_name'], status['text'], time_of_search)
+        aws_conn.insert_tweet_likes(likers, tweet_id)
+    finally:
+        remove_tweet_from_running_tasks(app_user_email, status['screen_name'], status['id'], time_of_search)
 
     return {'status': 'new tweet'}
-    '''
-    
-
-    
-
-    
-    print('WROTE TWEET LIKES')
-    aws_conn.insert_searched_tweet(app_user_email, tweet_id, time_of_search)
-    print('WROTE SEARCHED')
-    '''
-    pass
-
-    # update app_user's profile
-
-    # else
-    # get screen name of likers
-    # scrape tweets of all users
-    # run it through NLP
-    # update app_user's profile
 
 
 def add_label_user_task_to_queue(app_user_email, screen_name, time_of_search):
@@ -260,9 +246,9 @@ def add_label_user_task_to_queue(app_user_email, screen_name, time_of_search):
     :return:
     """
     # with label_tweet_task_lock:
-    tasks_for_user = label_user_tasks[app_user_email]
+    tasks_for_user = running_user_tasks[app_user_email]
     tasks_for_user.append((screen_name, time_of_search))
-    label_user_tasks[app_user_email] = tasks_for_user
+    running_user_tasks[app_user_email] = tasks_for_user
 
 
 def remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search):
@@ -274,19 +260,20 @@ def remove_label_user_task_from_queue(app_user_email, screen_name, time_of_searc
     :return:
     """
     # label_user_task_lock.acquire()
-    in_progress_for_user = label_user_tasks[app_user_email]
+    in_progress_for_user = running_user_tasks[app_user_email]
     in_progress_for_user.remove((screen_name, time_of_search))
-    label_user_tasks[app_user_email] = in_progress_for_user
+    running_user_tasks[app_user_email] = in_progress_for_user
     # label_user_task_lock.release()
 
 
-def add_label_tweet_task_to_queue(app_user_email, screen_name, tweet_id, time_of_search):
-    in_progress_for_user = label_tweet_tasks[app_user_email]
+def add_tweet_to_running_tasks(app_user_email, screen_name, tweet_id, time_of_search):
+    print('entered add label tweet to running tasks')
+    in_progress_for_user = running_tweet_tasks[app_user_email]
     in_progress_for_user.append((screen_name, tweet_id, time_of_search))
-    label_tweet_tasks[app_user_email] = in_progress_for_user
+    running_tweet_tasks[app_user_email] = in_progress_for_user
 
 
-def remove_label_tweet_task_from_queue(app_user_email, screen_name, tweet_id, time_of_search):
-    in_progress_for_user = label_tweet_tasks[app_user_email]
+def remove_tweet_from_running_tasks(app_user_email, screen_name, tweet_id, time_of_search):
+    in_progress_for_user = running_tweet_tasks[app_user_email]
     in_progress_for_user.remove((screen_name, tweet_id, time_of_search))
-    label_tweet_tasks[app_user_email] = in_progress_for_user
+    running_tweet_tasks[app_user_email] = in_progress_for_user
