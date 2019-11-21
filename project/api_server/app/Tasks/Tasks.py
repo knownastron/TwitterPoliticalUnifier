@@ -30,8 +30,9 @@ aws_conn = SQLConnection.AWSConnection(mysql_aws_credentials.HOST, mysql_aws_cre
 
 # Set up TwitterScrapper and TwitterConnection
 rate_delay_seconds = 5
-error_delay_seconds = 10
-twit_scraper = TwitterScraper.TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, None)
+error_delay_seconds = 6
+max_tweets = 200
+twit_scraper = TwitterScraper.TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, max_tweets)
 
 twit_conn = TwitterConnection.TwitterConnection()
 
@@ -172,17 +173,17 @@ def predict_tweet(self, app_user_email, tweet_id):
         if app_user_email in running_tweet_tasks:
             print('email in task list')
             print(running_tweet_tasks[app_user_email])
-            for (cur_screen_name, cur_tweet_id, cur_time) in running_tweet_tasks[app_user_email]:
+            for (cur_screen_name, cur_tweet_id, cur_text, cur_time) in running_tweet_tasks[app_user_email]:
                 if cur_tweet_id == status['id']:
                     return {'status': 'already in progress'}
             print('appending tweet to task list')
-            add_tweet_to_running_tasks(app_user_email, status['screen_name'], status['id'], time_of_search)
+            add_tweet_to_running_tasks(app_user_email, status['screen_name'], status['id'], status['text'], time_of_search)
         else:
             print('adding email to label tweet tasks')
-            running_tweet_tasks[app_user_email] = [(status['screen_name'], status['id'], time_of_search)]
+            running_tweet_tasks[app_user_email] = [(status['screen_name'], status['id'], status['text'], time_of_search)]
 
     print(running_tweet_tasks)
-    time.sleep(10)
+    # time.sleep(10)
     try:
         # checks if tweet has already been searched and predicted before
         previous_tweet = aws_conn.get_searched_tweet_by_id(tweet_id) #status or False
@@ -208,7 +209,7 @@ def predict_tweet(self, app_user_email, tweet_id):
                     tweets = twit_scraper.get_tweets()
                     raw_tweets = twit_scraper.get_raw_tweets()
                     tweets_joined = ' '.join(raw_tweets)
-                    print('GOT TWEETS')
+                    print('GOT TWEETS ' + str(len(tweets)))
 
                     cleaned_text = Format.Format.denoise_tweet(tweets_joined)
                     cleaned_text = Format.Format.stem_words_str(cleaned_text)
@@ -231,9 +232,23 @@ def predict_tweet(self, app_user_email, tweet_id):
         aws_conn.insert_searched_tweet(app_user_email, status['id'], status['screen_name'], status['text'], time_of_search)
         aws_conn.insert_tweet_likes(likers, tweet_id)
     finally:
-        remove_tweet_from_running_tasks(app_user_email, status['screen_name'], status['id'], time_of_search)
+        remove_tweet_from_running_tasks(app_user_email, status['screen_name'], status['id'], status['text'], time_of_search)
 
     return {'status': 'new tweet'}
+
+
+@celery.task(bind=True)
+def get_searched_tweets(self, app_user_email):
+    searched_tweets = []
+    with label_tweet_task_lock:
+        if app_user_email in running_tweet_tasks:
+            # (status['screen_name'], status['id'], time_of_search)
+            in_progress = running_tweet_tasks[app_user_email]
+            for tweet_task in in_progress:
+                searched_tweets.append((app_user_email, tweet_task[0], tweet_task[1], tweet_task[2], tweet_task[3], 'In progress...'))
+    db_tweets = aws_conn.get_searched_tweets_by_email(app_user_email)
+    searched_tweets.extend(db_tweets)
+    return searched_tweets
 
 
 def add_label_user_task_to_queue(app_user_email, screen_name, time_of_search):
@@ -266,14 +281,14 @@ def remove_label_user_task_from_queue(app_user_email, screen_name, time_of_searc
     # label_user_task_lock.release()
 
 
-def add_tweet_to_running_tasks(app_user_email, screen_name, tweet_id, time_of_search):
+def add_tweet_to_running_tasks(app_user_email, screen_name, tweet_id, text, time_of_search):
     print('entered add label tweet to running tasks')
     in_progress_for_user = running_tweet_tasks[app_user_email]
-    in_progress_for_user.append((screen_name, tweet_id, time_of_search))
+    in_progress_for_user.append((screen_name, tweet_id, text, time_of_search))
     running_tweet_tasks[app_user_email] = in_progress_for_user
 
 
-def remove_tweet_from_running_tasks(app_user_email, screen_name, tweet_id, time_of_search):
+def remove_tweet_from_running_tasks(app_user_email, screen_name, tweet_id, text, time_of_search):
     in_progress_for_user = running_tweet_tasks[app_user_email]
-    in_progress_for_user.remove((screen_name, tweet_id, time_of_search))
+    in_progress_for_user.remove((screen_name, tweet_id, text, time_of_search))
     running_tweet_tasks[app_user_email] = in_progress_for_user
