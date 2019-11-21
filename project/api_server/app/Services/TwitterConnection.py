@@ -43,6 +43,16 @@ class TwitterConnection:
         self.auth.set_access_token(twitter_credentials.ACCESS_TOKEN, twitter_credentials.ACCESS_TOKEN_SECRET)
         self.api = API(self.auth)
 
+    def get_tweet(self, tweet_id):
+        """
+        Returns the Tweet Id, text, screen name, date created
+
+        :param tweet_id: an int
+        :return: a tweepy Status object
+        """
+        status = self.api.get_status(tweet_id)
+        return status.id, status.author.screen_name.lower(), status.text, status.created_at
+
     def get_text_of_tweet(self, username, num_tweets, print_progress=False):
         """
         Gets all the texts of a tweet:
@@ -113,7 +123,7 @@ class TwitterConnection:
         likers = re.findall(
             'div class=\\\\"account  js-actionable-user js-profile-popup-actionable \\\\" data-screen-name=\\\\"(.+?)\\\\" data-user-id=\\\\"',
             text)
-        likers = [Format.format_username(x) for x in likers]
+        likers = [liker.lower() for liker in likers]
         return likers
 
     def get_usernames_of_tweets_liked_by(self, username, fav_count, print_progress=False):
@@ -140,7 +150,7 @@ class TwitterConnection:
         :return: list of tuples (username, user_id_str)
         """
         user_objects = self.api.lookup_users(screen_names=usernames)
-        user_ids = [(user.screen_name, user.id_str) for user in user_objects]
+        user_ids = [(user.screen_name.lower(), user.id_str) for user in user_objects]
         return user_ids
 
     def get_all_rate_limit_status(self):
@@ -161,3 +171,13 @@ class TwitterConnection:
                 if limit_info['remaining'] < limit_info['limit']:
                     print(key1, limit_info['limit'], limit_info['remaining'],
                           convert_epoch_seconds(limit_info['reset']))
+
+    def get_user_objects(self, usernames):
+        """
+        keys: 'id', 'id_str', 'name', 'screen_name', 'location'
+
+        :param usernames:
+        :return:
+        """
+        user_objects = self.api.lookup_users(screen_names=usernames)
+        return user_objects
