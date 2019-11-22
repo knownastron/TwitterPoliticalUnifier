@@ -33,6 +33,7 @@ class SearchedUsers extends React.Component {
               <tr>
                 <th className='user-th'>Username</th>
                 <th className='user-th'>Date Searched</th>
+                <th className='user-th'>Location</th>
                 <th className='user-th'>Political Prediction</th>
               </tr>
               {
@@ -49,7 +50,8 @@ class SearchedUsers extends React.Component {
 
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
-  email: state.auth.email
+  email: state.auth.email,
+  token: state.auth.token
 })
 
 
