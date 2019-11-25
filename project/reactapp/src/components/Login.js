@@ -39,6 +39,8 @@ class Login extends React.Component {
   render() {
     if (this.props.isAuthenticated) {
       return (< Redirect to="/dashboard" />)
+    } else if (this.props.confirmationRequired) {
+      return (< Redirect to="/verify" />)
     } else if (!this.state.toConfirm) {
       return (
         <div className="component-main-div">
@@ -70,6 +72,7 @@ class Login extends React.Component {
 
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
+  confirmationRequired: state.auth.confirmationRequired
 })
 
 export default connect(mapStateToProps, { loginUser })(Login);
