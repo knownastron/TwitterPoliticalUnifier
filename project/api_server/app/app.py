@@ -112,12 +112,12 @@ def predictUser1():
     return {'username': username, 'politicalLabel': prediction[0]}
 
 
-
 @app.route('/api/2.0/test', methods=['POST'])
 def test_2():
     result = Tasks.long_task.apply_async()
     print(result.id)
     return result.id
+
 
 @app.route('/api/2.0/test2', methods=['POST'])
 def test_3():
@@ -126,6 +126,7 @@ def test_3():
     print(data['id'])
     task.ready()
     return '202 ' + str(task.state)
+
 
 @app.route('/api/2.0/getsearchedusers', methods=['POST'])
 def get_searched_users():
@@ -142,6 +143,7 @@ def get_searched_users():
 
     for i, user in enumerate(result):
         print(user)
+
         ret['searchedUsers'].append({'id': i,
                                      'screenName': user[0],
                                      'searchDate': user[2],
@@ -204,6 +206,24 @@ def get_searched_tweets():
                                           'text': tweet[3],
                                           'searchDate': tweet[4],
                                           'inProgress': False})
+    return ret
+
+
+@app.route('/api/2.0/gettweetlikes', methods = ['POST'])
+def get_tweet_likes():
+    data = request.get_json()
+    task = Tasks.get_tweet_likes.apply_async([data['tweetId']])
+    task.wait()
+    result = task.result
+    ret = {'tweetLikes': []}
+
+    for i, item in enumerate(result):
+        ret['tweetLikes'].append({'id': i,
+                                  'screenName': item[0],
+                                  'userId': item[1],
+                                  'polLabel': item[2],
+                                  'location': item[3]})
+
     return ret
 
 
