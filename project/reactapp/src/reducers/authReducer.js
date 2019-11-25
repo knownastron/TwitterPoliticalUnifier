@@ -1,16 +1,18 @@
-import { LOGIN_USER_SUCCESS, LOGOUT_USER_SUCCESS} from '../actions/types';
+import { LOGIN_USER_SUCCESS,
+         LOGOUT_USER_SUCCESS,
+         USER_NOT_CONFIRMED,
+         RESET_USER_CONFIRMATION } from '../actions/types';
 
 const initialState = {
   curUser : '',
   email : '',
   error: '',
-  isAuthenticated : false
+  isAuthenticated : false,
+  confirmationRequired: false
 }
 
 export default function(state = initialState, action) {
-  // let newState = {};
   switch (action.type) {
-    // let newState = {};
 
     case LOGIN_USER_SUCCESS:
       console.log('reducer')
@@ -21,7 +23,6 @@ export default function(state = initialState, action) {
         email: action.payload.attributes.email,
         isAuthenticated: true
       }
-      // return Object.assign({}, state, newState);
 
     case LOGOUT_USER_SUCCESS:
       return {
@@ -31,7 +32,26 @@ export default function(state = initialState, action) {
         email: '',
         curUser: ''
       }
+
+    case USER_NOT_CONFIRMED:
+      return {
+        ...state,
+        confirmationRequired: true,
+        isAuthenticated: false,
+        token: '',
+        email: action.payload.email,
+        curUser: ''
+      }
+
+    case RESET_USER_CONFIRMATION:
+      return {
+        ...state,
+        confirmationRequired: false
+      }
     default:
      return state;
+
+
+
   }
 }
