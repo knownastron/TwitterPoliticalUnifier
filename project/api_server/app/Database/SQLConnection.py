@@ -273,7 +273,6 @@ class AWSConnection():
             cur.execute(sql, (screen_name, tweet_id))
         self.conn.commit()
 
-
     def get_screen_name_from_tweet_likes(self, tweet_id):
         sql = "SELECT ScreenName FROM TweetLikes where TweetId = %s"
         cur = self.conn.cursor()
@@ -281,6 +280,16 @@ class AWSConnection():
         screen_names = cur.fetchall()
         return screen_names
 
+    def get_tweet_like_info(self, tweet_id):
+        """
+        Get info of Users who liked a specific tweet
+        """
+        sql = '''select ScreenName, UserId, PolLabel, Location from TweetLikes natural join TwitterUsers 
+                 where TweetId = %s; '''
+        cur = self.conn.cursor()
+        cur.execute(sql, (tweet_id))
+        info = cur.fetchall()
+        return info
 
 
 
