@@ -36,6 +36,26 @@
   padding: 10px;
 }
 
+.tweet-details-div {
+  /* display: inline-flex; */
+}
+
+.tweet-detail-table {
+  /* display: inline-block; */
+  /* float: left; */
+  margin-top: 30px;
+  border: 1px solid black;
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.tweet-embed {
+  margin-top: 100px;
+  /* display: inline-block; */
+  /* float: left; */
+}
+
 .component-main-div {
   background-color: #FAFAFA;
   /* background-color: red; */
