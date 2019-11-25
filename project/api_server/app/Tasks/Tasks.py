@@ -79,14 +79,14 @@ def long_task(self):
             'result': 42}
 
 
-@celery.task(bind=True)
-def create_new_user(self, email):
+@celery.task()
+def create_new_user(email):
     aws_conn.create_user_profile(email)
     return
 
 
-@celery.task(bind=True)
-def predict_user(self, screen_name, app_user_email):
+@celery.task()
+def predict_user(screen_name, app_user_email):
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     with label_user_task_lock:
@@ -146,8 +146,8 @@ def predict_user(self, screen_name, app_user_email):
     return {'status': 'added new user'}
 
 
-@celery.task(bind=True)
-def get_searched_users(self, app_user_email):
+@celery.task()
+def get_searched_users(app_user_email):
     print('entered get_searched_users')
     searched_users = []
     global running_user_tasks
@@ -160,8 +160,8 @@ def get_searched_users(self, app_user_email):
     return searched_users
 
 
-@celery.task(bind=True)
-def predict_tweet(self, app_user_email, tweet_id):
+@celery.task()
+def predict_tweet(app_user_email, tweet_id):
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # from this point on use status
@@ -237,8 +237,8 @@ def predict_tweet(self, app_user_email, tweet_id):
     return {'status': 'new tweet'}
 
 
-@celery.task(bind=True)
-def get_searched_tweets(self, app_user_email):
+@celery.task()
+def get_searched_tweets(app_user_email):
     searched_tweets = []
     with label_tweet_task_lock:
         if app_user_email in running_tweet_tasks:
@@ -249,6 +249,12 @@ def get_searched_tweets(self, app_user_email):
     db_tweets = aws_conn.get_searched_tweets_by_email(app_user_email)
     searched_tweets.extend(db_tweets)
     return searched_tweets
+
+
+@celery.task()
+def get_tweet_likes(tweet_id):
+    tweet_like_info = aws_conn.get_tweet_like_info(tweet_id)
+    return tweet_like_info
 
 
 def add_label_user_task_to_queue(app_user_email, screen_name, time_of_search):
