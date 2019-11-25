@@ -1,6 +1,8 @@
 import React from 'react'
 import { Auth } from "aws-amplify";
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
+import { resetConfirmation } from '../actions/authActions'
 
 
 class Verify extends React.Component {
@@ -9,6 +11,11 @@ class Verify extends React.Component {
     code: '',
     success: false
   };
+
+  componentDidMount() {
+    // reset user_not_confirmed
+    this.props.resetConfirmation()
+  }
 
   validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -62,6 +69,7 @@ class Verify extends React.Component {
               id="emailInput"
               name="email"
               placeholder="Email Address"
+              value={this.props.email}
               onChange={this.onChange}/>
 
             <label htmlFor="code">Verification Code</label>
@@ -82,8 +90,11 @@ class Verify extends React.Component {
         <Redirect to="/" />
       )
     }
-
   }
 }
 
-export default Verify;
+const mapStateToProps = state => ({
+  email: state.auth.email
+})
+
+export default connect(mapStateToProps, { resetConfirmation })(Verify);
