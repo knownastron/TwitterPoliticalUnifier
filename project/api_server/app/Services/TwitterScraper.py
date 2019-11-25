@@ -195,7 +195,7 @@ class TwitterSearchImpl(TwitterSearch):
         self.max_tweets = max_tweets
         self.counter = 0
         self.saved_tweets = []
-        self.saved_raw_tweets = []  # just the tweet text
+        self.saved_raw_tweets = set()  # just the tweet text
 
     def save_tweets(self, tweets):
         """
@@ -203,19 +203,15 @@ class TwitterSearchImpl(TwitterSearch):
         :return:
         """
         for tweet in tweets:
-            # Lets add a counter so we only collect a max number of tweets
-            self.counter += 1
+
 
             if tweet['created_at'] is not None:
                 # log.info("%i [%s] - %s" % (self.counter, tweet['created_at'], tweet['text']))
-                self.saved_tweets.append(tweet)
-                self.saved_raw_tweets.append(tweet['text'])
-                # print(self.counter)
-                # print('tweet_id', tweet['tweet_id'])
-                # print('user_id', tweet['user_id'])
-                # print('created_at', tweet['created_at'])
-                # print('user_name', tweet['user_name'])
-                # print('text\n\n\n')
+                if tweet['text'] not in self.saved_raw_tweets:
+                    self.saved_tweets.append(tweet)
+                    self.saved_raw_tweets.add(tweet['text'])
+                    # Lets add a counter so we only collect a max number of tweets
+                    self.counter += 1
 
             # When we've reached our max limit, return False so collection stops
             if self.max_tweets is not None and self.counter >= self.max_tweets:
@@ -227,14 +223,14 @@ class TwitterSearchImpl(TwitterSearch):
         return self.saved_tweets
 
     def get_raw_tweets(self):
-        return self.saved_raw_tweets
+        return list(self.saved_raw_tweets)
 
     def get_num_tweets(self):
         return len(self.saved_tweets)
 
     def clear_tweets(self):
         self.saved_tweets = []
-        self.saved_raw_tweets = []
+        self.saved_raw_tweets = set()
         self.counter = 0
 
 
