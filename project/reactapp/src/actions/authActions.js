@@ -9,7 +9,7 @@ export const loginUser = (loginInfo) => async dispatch => {
     loginInfo.email,
     loginInfo.password
   ).then(user => {
-    console.log(user)
+    console.log(user);
     // console.log(user.signInUserSession.idToken.jwtToken);
     dispatch({
       type: LOGIN_USER_SUCCESS,
