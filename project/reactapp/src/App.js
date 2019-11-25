@@ -10,6 +10,8 @@ import SignUp from './components/SignUp'
 import Verify from './components/Verify'
 import Test from './components/Test'
 import SearchedUsers from './components/SearchedUsers'
+import SearchedTweets from './components/SearchedTweets'
+import TweetDetails from './components/TweetDetails'
 import {
   BrowserRouter as Router,
   Switch,
@@ -46,7 +48,9 @@ function App() {
             </Route>
             <Route path="/dashboard">
               <SearchedUsers />
+              <SearchedTweets />
             </Route>
+            <Route path="/tweetdetails/:id" component={TweetDetails} />
           </Switch>
           </div>
         </div>
