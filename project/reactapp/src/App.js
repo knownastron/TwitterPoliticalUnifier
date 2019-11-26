@@ -12,6 +12,7 @@ import Test from './components/Test'
 import SearchedUsers from './components/SearchedUsers'
 import SearchedTweets from './components/SearchedTweets'
 import TweetDetails from './components/TweetDetails'
+import LandingPage from './components/LandingPage'
 import {
   BrowserRouter as Router,
   Switch,
@@ -30,6 +31,9 @@ function App() {
           <div className="AppBody">
           <Switch>
             <Route exact path="/">
+              <LandingPage />
+            </Route>
+            <Route path="/home">
               <LabelTweet />
               <LabelUser />
             </Route>
