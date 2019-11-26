@@ -53,8 +53,8 @@ class LabelUser extends React.Component {
   render() {
     return (
       <div className="component-main-div">
-        <h2> Label User </h2>
-        <p> something something describing this feature</p>
+        <h2> Twitter User's Political Affiliation </h2>
+        <p> Discover a Twitter user's political leanings <br/> based on their tweet history</p>
         <form onSubmit={this.submission}>
           <label htmlFor="email">Email</label>
           <input type="text"
