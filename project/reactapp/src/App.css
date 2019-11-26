@@ -13,8 +13,24 @@
 .AppBody {
   text-align: center;
   display: inline-block;
-  width: 80%;
+  width: 100%;
 }
+
+.landing-page-div {
+  background-image: url('./images/landingpageimage.png');
+  background-repeat: no-repeat;
+  /* background-size: contain; */
+  background-size: cover;
+
+}
+
+#landing-page-h1 {
+  padding-top: 10%;
+  padding-bottom: 100%;
+  /* background: rgba(0, 151, 19, 0.1);  */
+}
+
+
 
 .user-table {
   margin-top: 30px;
