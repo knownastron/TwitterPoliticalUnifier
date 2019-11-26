@@ -60,7 +60,8 @@ class LabelTweet extends React.Component {
   render() {
     return (
       <div className="component-main-div">
-        <h2> Label Tweet </h2>
+        <h2> Tweet Polarization </h2>
+        <p> Discover a Tweet's polarization based on the users who liked the tweet</p>
         <form onSubmit={this.submission}>
           <label htmlFor="email">Email</label>
           <input type="text"
