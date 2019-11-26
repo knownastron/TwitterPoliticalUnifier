@@ -21,7 +21,7 @@ class Header extends React.Component {
           <h3 className="title">Twitter Political Unifier</h3>
 
           <div className="header-right">
-            <Link to="/">Home</Link>
+            <Link to="/home">Home</Link>
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/contact">Contact</Link>
             <Link to="/about">About</Link>
