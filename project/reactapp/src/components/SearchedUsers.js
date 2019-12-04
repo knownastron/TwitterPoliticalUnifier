@@ -8,6 +8,7 @@ class SearchedUsers extends React.Component {
     users: []
   }
   componentDidMount() {
+    // const url = 'https://www.knownastron.com:6001/api/2.0/getsearchedusers';
     const url = 'http://127.0.0.1:5000/api/2.0/getsearchedusers';
     let self = this;
     axios.post(url, JSON.stringify({
@@ -27,22 +28,24 @@ class SearchedUsers extends React.Component {
   render() {
     return (
       <div className="component-main-div">
-        <h1> Searched Users History </h1>
-        <table className="user-table">
-            <tbody>
-              <tr>
-                <th className='user-th'>Username</th>
-                <th className='user-th'>Date Searched</th>
-                <th className='user-th'>Location</th>
-                <th className='user-th'>Political Prediction</th>
-              </tr>
-              {
-                this.state.users.map((user) => (
-                  <SearchedUserItem key={user.id} user={user} />
-                ))
-              }
-          </tbody>
-        </ table>
+        <h2> Searched Users History </h2>
+        <div className='center-single'>
+          <table className="user-table">
+              <tbody>
+                <tr>
+                  <th className='user-th'>Username</th>
+                  <th className='user-th'>Date Searched</th>
+                  <th className='user-th'>Location</th>
+                  <th className='user-th'>Political Prediction</th>
+                </tr>
+                {
+                  this.state.users.map((user) => (
+                    <SearchedUserItem key={user.id} user={user} />
+                  ))
+                }
+            </tbody>
+          </ table>
+        </div>
       </div>
     )
   }

@@ -9,7 +9,9 @@ class SearchedTweets extends React.Component {
   }
 
   componentDidMount() {
+    // const url = 'https://www.knownastron.com:6001/api/2.0/getsearchedtweets';
     const url = 'http://127.0.0.1:5000/api/2.0/getsearchedtweets';
+
     let self = this;
     axios.post(url, JSON.stringify({
       // 'token': token
@@ -23,27 +25,31 @@ class SearchedTweets extends React.Component {
     .catch(function (error) {
       console.log(error)
     });
+
+
   }
 
   render() {
     return (
       <div className="component-main-div">
-        <h1> Searched Tweet History </h1>
-        <table className="user-table">
-            <tbody>
-              <tr>
-                <th className='user-th'>Author</th>
-                <th className='user-th'>TweetId</th>
-                <th className='user-th'>Date Searched</th>
-                <th className='user-th'>Status</th>
-              </tr>
-              {
-                this.state.tweets.map((tweet) => (
-                  <SearchedTweetItem key={tweet.id} tweet={tweet} />
-                ))
-              }
-          </tbody>
-        </ table>
+        <h2> Searched Tweet History </h2>
+        <div className='center-single'>
+          <table className="user-table">
+              <tbody>
+                <tr>
+                  <th className='user-th'>Author</th>
+                  <th className='user-th'>TweetId</th>
+                  <th className='user-th'>Date Searched</th>
+                  <th className='user-th'>Status</th>
+                </tr>
+                {
+                  this.state.tweets.map((tweet) => (
+                    <SearchedTweetItem key={tweet.id} tweet={tweet} />
+                  ))
+                }
+            </tbody>
+          </ table>
+      </div>
       </div>
     )
   }
