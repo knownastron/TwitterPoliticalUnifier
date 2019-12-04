@@ -29,13 +29,13 @@ class Header extends React.Component {
     return (
       <div className={["header", "clearfix"].join(' ')}>
         <div id="header-content">
-          <img src="epluribusunum.png" id="logo" alt=''/>
+          <img src={require("../images/epluribusunum.png")} id="logo" alt=''/>
           <h3 className="title">Twitter Political Unifier</h3>
 
           <div className="header-right">
             <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
               <DropdownToggle style={{backgroundColor: '#323232', border: 'none'}}>
-                <img src="threelinebutton.png" id='three-line' alt=''/>
+                <img src={require("../images/threelinebutton.png")} id='three-line' alt=''/>
               </DropdownToggle>
               <DropdownMenu >
                 <DropdownItem><Link to="/home">Home</Link></DropdownItem>
