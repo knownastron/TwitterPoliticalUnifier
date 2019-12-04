@@ -121,46 +121,49 @@ class TweetDetails extends React.Component {
       <div className="component-main-div">
 
         <h1>Tweet Details for:</h1>
-          <div style={{display:'flex',justifyContent:'center'}}>
+          <div className='center-single'>
             <TwitterTweetEmbed tweetId={this.props.match.params.id}/>
           </div>
-          <table className="tweet-detail-table">
-              <tbody>
-                <tr>
-                  <th className='user-th'>Username</th>
-                  <th className='user-th'>Location</th>
-                  <th className='user-th'>Political Prediction</th>
-                </tr>
-                {
-                  this.state.users.map((user) => (
-                    <SearchedUserItem key={user.id} user={user} />
-                  ))
-                }
-            </tbody>
-          </table>
-          <Map style={muh_style} center={position} zoom={this.state.zoom}>
-            <TileLayer
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'/>
-            {
-              this.state.userInfoWithGeo.map((curUser, i) => (
-                curUser.coordinates.error ? null :
-                  curUser.polLabel === 'conservative' ?
-                  <Marker key={i} icon={gop} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
-                        // <Popup>
-                        //   <img src='threelinebutton.png'></img>
-                        // </Popup>
-                  </Marker> :
-                  <Marker key={i} icon={dem} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
-                        // <Popup>
-                        //   <img src='threelinebutton.png'></img>
-                        // </Popup>
-                  </Marker>
+          <div className='center-single'>
+            <table className="tweet-detail-table">
+                <tbody>
+                  <tr>
+                    <th className='user-th'>Username</th>
+                    <th className='user-th'>Location</th>
+                    <th className='user-th'>Political Prediction</th>
+                  </tr>
+                  {
+                    this.state.users.map((user) => (
+                      <SearchedUserItem key={user.id} user={user} />
+                    ))
+                  }
+              </tbody>
+            </table>
+          </div>
+          <div className='center-single'>
+            <Map className="map" center={position} zoom={this.state.zoom}>
+              <TileLayer
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'/>
+              {
+                this.state.userInfoWithGeo.map((curUser, i) => (
+                  curUser.coordinates.error ? null :
+                    curUser.polLabel === 'conservative' ?
+                    <Marker key={i} icon={gop} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
+                          // <Popup>
+                          //   <img src='threelinebutton.png'></img>
+                          // </Popup>
+                    </Marker> :
+                    <Marker key={i} icon={dem} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
+                          // <Popup>
+                          //   <img src='threelinebutton.png'></img>
+                          // </Popup>
+                    </Marker>
 
-              ))
-            }
-          </Map>
-
+                ))
+              }
+            </Map>
+          </div>
       </div>
     )
   }
