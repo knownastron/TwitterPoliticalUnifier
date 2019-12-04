@@ -41,7 +41,6 @@ export const logoutUser = () => async dispatch => {
       dispatch({
         type: LOGOUT_USER_SUCCESS
       })
-      alert('Log out successful')
     })
     .catch(err => console.log(err));
 }
