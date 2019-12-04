@@ -3,33 +3,51 @@ import './Header.css'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux';
 import { logoutUser } from '../actions/authActions';
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+
 
 class Header extends React.Component {
+  state = {
+    selectedOption: null,
+    dropDownValue: 'Select action',
+    dropdownOpen: false
+  };
+
   onLogout = (e) => {
     console.log(this.props.isAuthenticated);
     this.props.logoutUser();
-    // Auth.signOut()
-    //   .then(data => console.log(data))
-    //   .catch(err => console.log(err));
   }
+
+  toggle = (e) =>{
+        this.setState({
+            dropdownOpen: !this.state.dropdownOpen
+        });
+    }
+
 
   render() {
     return (
-      <div className="header">
+      <div className={["header", "clearfix"].join(' ')}>
         <div id="header-content">
           <img src="epluribusunum.png" id="logo" alt=''/>
           <h3 className="title">Twitter Political Unifier</h3>
 
           <div className="header-right">
-            <Link to="/home">Home</Link>
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/contact">Contact</Link>
-            <Link to="/about">About</Link>
-            {
-              this.props.isAuthenticated ?
-              <Link to="/" onClick={this.onLogout}>Logout</Link>
-              : <Link to="/login">Login</Link>
-            }
+            <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+              <DropdownToggle style={{backgroundColor: '#323232', border: 'none'}}>
+                <img src="threelinebutton.png" id='three-line' alt=''/>
+              </DropdownToggle>
+              <DropdownMenu >
+                <DropdownItem><Link to="/home">Home</Link></DropdownItem>
+                <DropdownItem><Link to="/dashboard">Dashboard</Link></DropdownItem>
+                <DropdownItem><Link to="/about">About</Link></DropdownItem>
+                <DropdownItem>{
+                  this.props.isAuthenticated ?
+                  <Link to="/" onClick={this.onLogout}>Logout</Link>
+                  : <Link to="/login">Login</Link>
+                }</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </div>
         </div>
       </div>
