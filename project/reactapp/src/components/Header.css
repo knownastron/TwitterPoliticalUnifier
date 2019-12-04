@@ -6,16 +6,28 @@
   height: 40px;
 }
 
-.header {
-  overflow: hidden;
-  background-color: #323232;
-  /* padding: 10px; */
-  width: 100%;
+#three-line {
+  width: 40px;
+  height: 40px;
+}
 
+.clearfix:after {
+  content: ".";
+  visibility: hidden;
+  display: block;
+  height: 0;
+  clear: both;
+}
+
+.header {
+  overflow: visible;
+  background-color: #323232;
+  padding: 5px;
+  width: 100%;
 }
 
 #header-content {
-  width: 90%;
+  width: 80%;
   margin: 0 auto;
 }
 
@@ -23,14 +35,15 @@
 .header a {
   font-family: SFDisplay;
   float: left;
-  color: white;
+  color: black;
   text-align: center;
-  padding: 18px;
-  text-decoration: none;
-  font-size: 16px;
-  line-height: 20px;
-  border-radius: 4px;
+  /* padding: 18px; */
+  /* text-decoration: none; */
+  font-size: 20px;
+  line-height: 32px;
+  /* border-radius: 4px; */
 }
+
 .title {
   font-family: SFDisplay;
   float: left;
@@ -46,32 +59,13 @@
   pointer-events: none
 }
 
-
-/* Style the active/current link*/
-/* .header a.active {
-  background-color: grey;
-  color: white;
-} */
-
 .header a:hover {
-  background-color: grey;
-  color: white;
+  /* background-color: white; */
+  color: black;
   text-decoration: none;
 }
 
 /* Float the link section to the right */
 .header-right {
   float: right;
-}
-
-/* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
-@media screen and (max-width: 500px) {
-  .header a {
-    float: none;
-    display: block;
-    text-align: left;
-  }
-  .header-right {
-    float: none;
-  }
 }
