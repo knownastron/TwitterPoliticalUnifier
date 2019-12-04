@@ -40,6 +40,7 @@ class LabelTweet extends React.Component {
     }
 
     let token = this.props.token;
+    // const url = 'https://www.knownastron.com:6001/api/2.0/labeltweet';
     const url = 'http://127.0.0.1:5000/api/2.0/labeltweet';
 
     axios.post(url, JSON.stringify({
