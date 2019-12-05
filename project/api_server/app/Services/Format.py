@@ -80,7 +80,7 @@ class Format():
         """
         input_text_split = input_text.split()
         stemmed_output = [Format.stem.stem(word) for word in input_text_split]
-        return ''.join(stemmed_output)
+        return ' '.join(stemmed_output)
 
     @staticmethod
     def stem_words_list(input_text_split):
@@ -103,6 +103,7 @@ class Format():
         tweet_text = Format.remove_hashtags(tweet_text)
         tweet_text = Format.remove_mentions(tweet_text)
         tweet_text = Format.remove_picture_links(tweet_text)
+        tweet_text = Format.remove_new_line(tweet_text)
         tweet_text = Format.remove_punctuation(tweet_text)
         tweet_text_split = tweet_text.split()
         tweet_text_split = Format.remove_stopwords(tweet_text_split)
