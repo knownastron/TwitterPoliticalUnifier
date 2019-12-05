@@ -183,5 +183,6 @@ class TwitterConnection:
         :param usernames:
         :return:
         """
+
         user_objects = self.api.lookup_users(screen_names=usernames)
         return user_objects
