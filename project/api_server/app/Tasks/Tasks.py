@@ -5,7 +5,7 @@ import joblib
 import celery
 from celery import Celery
 from Database import SQLConnection
-from Database import mysql_aws_credentials
+from Config import mysql_aws_credentials
 from Services import TwitterScraper
 from Services import Format
 from Services import TwitterConnection
