@@ -44,30 +44,33 @@ class TwitterSearch(object):
         continue_search = True
         min_tweet = None
         response = self.execute_search(url)
-        while response is not None and continue_search and response['items_html'] is not None:
-            tweets = self.parse_tweets(response['items_html'])
+        while response is not None and continue_search:
+            if 'items_html' in response.keys():
+                if response['items_html'] is not None:
+                    tweets = self.parse_tweets(response['items_html'])
 
-            # If we have no tweets, then we can break the loop early
-            if len(tweets) == 0:
-                break
+                    # If we have no tweets, then we can break the loop early
+                    if len(tweets) == 0:
+                        break
 
-            # If we haven't set our min tweet yet, set it now
-            if min_tweet is None:
-                min_tweet = tweets[0]
+                    # If we haven't set our min tweet yet, set it now
+                    if min_tweet is None:
+                        min_tweet = tweets[0]
 
-            continue_search = self.save_tweets(tweets)
+                    continue_search = self.save_tweets(tweets)
 
-            # Our max tweet is the last tweet in the list
-            max_tweet = tweets[-1]
-            if min_tweet['tweet_id'] is not max_tweet['tweet_id']:
-                if "min_position" in response.keys():
-                    max_position = response['min_position']
-                else:
-                    max_position = "TWEET-%s-%s" % (max_tweet['tweet_id'], min_tweet['tweet_id'])
-                url = self.construct_url(query, max_position=max_position)
-                # Sleep for our rate_delay
-                sleep(self.rate_delay)
-                response = self.execute_search(url)
+                    # Our max tweet is the last tweet in the list
+                    max_tweet = tweets[-1]
+                    if min_tweet['tweet_id'] is not max_tweet['tweet_id']:
+                        if "min_position" in response.keys():
+                            max_position = response['min_position']
+                        else:
+                            max_position = "TWEET-%s-%s" % (max_tweet['tweet_id'], min_tweet['tweet_id'])
+                        url = self.construct_url(query, max_position=max_position)
+                        # Sleep for our rate_delay
+                        print('.')
+                        sleep(self.rate_delay)
+                        response = self.execute_search(url)
 
     def execute_search(self, url):
         """
@@ -129,7 +132,7 @@ class TwitterSearch(object):
             user_details_div = li.find("div", class_="tweet")
             if user_details_div is not None:
                 tweet['user_id'] = user_details_div['data-user-id']
-                tweet['user_screen_name'] = user_details_div['data-screen-name']
+                tweet['user_screen_name'] = user_details_div['data-screen-name'].lower()
                 tweet['user_name'] = user_details_div['data-name']
 
             # Tweet date
