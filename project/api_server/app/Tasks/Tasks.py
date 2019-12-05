@@ -211,13 +211,15 @@ def predict_tweet(app_user_email, tweet_id):
                     tweets_joined = ' '.join(raw_tweets)
                     print('GOT TWEETS ' + str(len(tweets)))
 
-                    cleaned_text = Format.Format.denoise_tweet(tweets_joined)
-                    cleaned_text = Format.Format.stem_words_str(cleaned_text)
-                    print('CLEANED TWEETS')
+                    prediction = 'N/A'
+                    if len(tweets) != 0:
+                        cleaned_text = Format.Format.denoise_tweet(tweets_joined)
+                        cleaned_text = Format.Format.stem_words_str(cleaned_text)
+                        print('CLEANED TWEETS')
 
-                    vectorized_text = vectorizer.transform([cleaned_text])
-                    prediction = clf.predict(vectorized_text)[0]
-                    print('PREDICTED', prediction)
+                        vectorized_text = vectorizer.transform([cleaned_text])
+                        prediction = clf.predict(vectorized_text)[0]
+                        print('PREDICTED', prediction)
 
                     aws_conn.write_twitter_user(liker.screen_name.lower(), liker.id, liker.id_str, prediction, liker.location)
                     print('WROTE NEW USER')
