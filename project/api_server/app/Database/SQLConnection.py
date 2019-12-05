@@ -126,6 +126,13 @@ class AWSConnection():
         cur.execute(sql, (location, screen_name, ))
         self.conn.commit()
 
+    def get_user_pol_test(self, pol_label, test):
+        sql = "SELECT * FROM TwitterUsers where PolLabel = %s and Test = %s"
+        cur = self.conn.cursor()
+        cur.execute(sql, (pol_label, test,))
+        users = cur.fetchall()
+        return users
+
     '''
     Tweets Methods
     '''
