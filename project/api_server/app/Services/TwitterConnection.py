@@ -7,7 +7,7 @@ from tweepy import OAuthHandler
 from tweepy import Cursor
 from tweepy import RateLimitError
 from Services import Format
-from Services import twitter_credentials
+from Config import twitter_credentials
 
 
 def limit_handled(cursor):
