@@ -131,13 +131,15 @@ def get_searched_users():
                                          'screenName': user[0],
                                          'searchDate': user[2],
                                          'polLabel': user[5],
-                                         'location': ''})
+                                         'location': '',
+                                         'inProgress': True})
         else:
             ret['searchedUsers'].append({'id': i,
                                          'screenName': user[0],
                                          'searchDate': user[2],
                                          'polLabel': user[5],
-                                         'location': user[7]})
+                                         'location': user[7],
+                                         'inProgress': False})
     return jsonify(ret)
 
 
@@ -152,7 +154,6 @@ def predictUser2():
                         'message': 'Authentication Error'})
 
     task = Tasks.predict_user.apply_async([data['username'], data['email']])
-    # task.wait()
 
     resp = {'status_code': 401, 'task_id': task.id}
     return resp
@@ -168,7 +169,7 @@ def predictTweet2():
                         'message': 'Authentication Error'})
 
     task = Tasks.predict_tweet.apply_async([data['email'], data['tweetId']])
-    task.wait()
+
     return '202'
 
 
@@ -269,4 +270,8 @@ def auth_error(error=None):
 
 
 if __name__ == '__main__':
+    context = ('/etc/letsencrypt/live/knownastron.com/fullchain.pem',
+               '/etc/letsencrypt/live/knownastron.com/privkey.pem')
+
+    # app.run(threaded=True, host='0.0.0.0', port=6001, ssl_context=context)
     app.run(debug="True", threaded=True)
