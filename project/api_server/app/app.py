@@ -118,15 +118,13 @@ def get_searched_users():
                         'searchedUsers': [],
                         'message': 'Authentication Error'})
 
-    task = Tasks.get_searched_users.apply_async([email])
-    task.wait()
-    result = task.result
-    print(result)
+    task_user = Tasks.get_searched_users.apply_async([email])
+    task_user.wait()
+    result = task_user.result
+    # print('-------GET USERS-------', result)
     ret = {'statusCode': 200, 'searchedUsers': []}
 
     for i, user in enumerate(result):
-        print(user)
-
         #pending users have less than 7 items
         if len(user) < 7:
             ret['searchedUsers'].append({'id': i,
@@ -140,7 +138,6 @@ def get_searched_users():
                                          'searchDate': user[2],
                                          'polLabel': user[5],
                                          'location': user[7]})
-
     return jsonify(ret)
 
 
@@ -186,14 +183,12 @@ def get_searched_tweets():
                         'searchedTweets': [],
                         'message': 'Authentication Error'})
 
-    task = Tasks.get_searched_tweets.apply_async([data['email']])
-    task.wait()
-
-    result = task.result
-    print(result)
+    task_tweet = Tasks.get_searched_tweets.apply_async([data['email']])
+    task_tweet.wait()
+    result = task_tweet.result
+    # print('--------GET TWEETS------', result)
     ret = {'searchedTweets': []}
     for i, tweet in enumerate(result):
-        print(tweet)
         if len(tweet) == 6: #in progress tweets have an extra variable
             ret['searchedTweets'].append({'id': i,
                                           'tweetId': tweet[1],
