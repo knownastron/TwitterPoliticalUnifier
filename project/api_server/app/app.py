@@ -2,39 +2,18 @@ from flask import Flask
 from flask import request, url_for, jsonify, Response
 from flask_api import status
 from flask_cors import CORS
-
-import os  # remove later
-
-import json
 from Services import Format
 from Services import TwitterScraper
 from Tasks import Tasks
 from Services import Authentication
 from Services import Responses
-from celery import Celery
-import celery
 
 # temp
-import time
-import random
+import json
 import joblib
-from celery.task.control import inspect
-
 
 app = Flask(__name__)
-# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
-
-
-# set up CORS
-CORS(app)
-
-
-# Set up Celery
-# celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-# celery.conf.update(app.config)
-
-# jobListModel = JobListModel(database credentials, etc.)
+CORS(app) # set up CORS
 
 
 @app.route('/')
