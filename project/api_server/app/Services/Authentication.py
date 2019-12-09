@@ -57,3 +57,14 @@ def check_jwt(event, context):
     # now we can use the claims
     # print('Claim results:', claims)
     return claims
+
+
+def verify_jwt(data, email):
+    claims = check_jwt(data, None)
+
+    if not claims:
+        return False
+    elif claims['email'] != email:
+        return False
+
+    return True
