@@ -131,36 +131,49 @@ def test_3():
 @app.route('/api/2.0/getsearchedusers', methods=['POST'])
 def get_searched_users():
     data = request.get_json()
-    # claims = Authentication.check_jwt(data, None)
-    # email = claims['email']
     email = data['email']
+    auth = Authentication.verify_jwt(data, email)
+
+    if not auth:
+        return jsonify({'statusCode': 401,
+                        'searchedUsers': [],
+                        'message': 'Authentication Error'})
 
     task = Tasks.get_searched_users.apply_async([email])
     task.wait()
     result = task.result
     print(result)
-    ret = {'searchedUsers': []}
+    ret = {'statusCode': 200, 'searchedUsers': []}
 
     for i, user in enumerate(result):
         print(user)
 
-        ret['searchedUsers'].append({'id': i,
-                                     'screenName': user[0],
-                                     'searchDate': user[2],
-                                     'polLabel': user[5],
-                                     'location': user[7]})
+        #pending users have less than 7 items
+        if len(user) < 7:
+            ret['searchedUsers'].append({'id': i,
+                                         'screenName': user[0],
+                                         'searchDate': user[2],
+                                         'polLabel': user[5],
+                                         'location': ''})
+        else:
+            ret['searchedUsers'].append({'id': i,
+                                         'screenName': user[0],
+                                         'searchDate': user[2],
+                                         'polLabel': user[5],
+                                         'location': user[7]})
+
     return jsonify(ret)
 
 
 @app.route('/api/2.0/labeluser', methods=['POST'])
 def predictUser2():
     data = request.get_json()
-    # task = Tasks.short_task.delay(data['username'])
-    # print(data)
-    # verify = Authentication.check_jwt(data, None)
-    verify = True  # remove later
-    if not verify:
-        return auth_error()
+    email = data['email']
+    auth = Authentication.verify_jwt(data, email)
+
+    if not auth:
+        return jsonify({'statusCode': 401,
+                        'message': 'Authentication Error'})
 
     task = Tasks.predict_user.apply_async([data['username'], data['email']])
     # task.wait()
@@ -171,19 +184,29 @@ def predictUser2():
 @app.route('/api/2.0/labeltweet', methods=['POST'])
 def predictTweet2():
     data = request.get_json()
-    verify = True
-    if not verify:
-        return auth_error()
+    email = data['email']
+    auth = Authentication.verify_jwt(data, email)
+
+    if not auth:
+        return jsonify({'statusCode': 401,
+                        'message': 'Authentication Error'})
+
     task = Tasks.predict_tweet.apply_async([data['email'], data['tweetId']])
     task.wait()
     return '202'
 
+
 @app.route('/api/2.0/getsearchedtweets', methods=['POST'])
 def get_searched_tweets():
     data = request.get_json()
-    verify = True
-    if not verify:
-        return auth_error()
+    email = data['email']
+    auth = Authentication.verify_jwt(data, email)
+
+    if not auth:
+        return jsonify({'statusCode': 401,
+                        'searchedTweets': [],
+                        'message': 'Authentication Error'})
+
     task = Tasks.get_searched_tweets.apply_async([data['email']])
     task.wait()
 
@@ -212,6 +235,14 @@ def get_searched_tweets():
 @app.route('/api/2.0/gettweetlikes', methods = ['POST'])
 def get_tweet_likes():
     data = request.get_json()
+    email = data['email']
+    auth = Authentication.verify_jwt(data, email)
+
+    if not auth:
+        return jsonify({'statusCode': 401,
+                        'searchedTweets': [],
+                        'message': 'Authentication Error'})
+
     task = Tasks.get_tweet_likes.apply_async([data['tweetId']])
     task.wait()
     result = task.result
@@ -237,6 +268,7 @@ def create_new_user():
 
     resp = {'status_code': 200}
     return resp
+
 
 @app.errorhandler(404)
 def not_found(error=None):
