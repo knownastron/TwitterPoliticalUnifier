@@ -1,20 +1,18 @@
 import React from 'react'
 import './LabelTweet.css'
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router';
 import axios from 'axios';
 
 class LabelTweet extends React.Component {
   state = {
-    email: '',
-    tweeturl: ''
+    tweeturl: '',
+    redirectToLogIn: false,
+    redirectToDashboard: false
   };
 
   onChange = (e) => {
     this.setState({[e.target.name] : e.target.value})
-  }
-
-  validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   }
 
   validateTweetUrl = (tweeturl) => {
@@ -31,45 +29,41 @@ class LabelTweet extends React.Component {
 
   submission = (e) => {
     e.preventDefault()
+    if (!this.props.isAuthenticated) {
+      this.setState({redirectToLogIn: true})
+      alert('Please log in to use this feature.');
+      return;
+    }
     if (!this.validateTweetUrl(this.state.tweeturl)) {
-      alert('Invalid tweet url')
+      alert('Invalid tweet url');
     }
 
-    if (!this.validateEmail(this.state.email)) {
-      alert('Invalid email')
-    }
-
-    let token = this.props.token;
     // const url = 'https://www.knownastron.com:6001/api/2.0/labeltweet';
     const url = 'http://127.0.0.1:5000/api/2.0/labeltweet';
 
     axios.post(url, JSON.stringify({
         ...this.state,
-        token: token,
-        username: this.state.email,
+        token: this.props.token,
+        email: this.props.email,
         tweetId: this.state.tweeturl.split('/')[5]
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
-    .then(function(response) {
-      console.log(response)
+    .then((response) => {
+      this.setState({redirectToDashboard: true})
+      console.log(response);
     })
   }
 
-  emailChange = (e) => {
-    this.setState({email: e.target.value});
-  }
-
   render() {
+    if (this.state.redirectToLogIn) {
+      return (<Redirect to='/login' />);
+    } else if (this.state.redirectToDashboard) {
+      return (<Redirect to='/dashboard' />);
+    }
     return (
-      <div className="component-main-div">
+      <div className="component-half-div">
         <h2> Tweet Polarization </h2>
         <p> Discover a Tweet's polarization based on the users who liked the tweet</p>
         <form onSubmit={this.submission}>
-          <label htmlFor="email">Email</label>
-          <input type="text"
-            id="emailInput"
-            name="email"
-            placeholder="your email address"
-            onChange={this.onChange}/>
 
           <label htmlFor="tweeturl">Tweet URL</label>
           <input type="text"
@@ -87,7 +81,8 @@ class LabelTweet extends React.Component {
 
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
-  token: state.auth.token
+  token: state.auth.token,
+  email: state.auth.email
 })
 
 export default connect(mapStateToProps, {}) (LabelTweet);
