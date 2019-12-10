@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactTooltip from 'react-tooltip'
 
 class SearchedUserItem extends React.Component {
   state = {
@@ -17,8 +18,10 @@ class SearchedUserItem extends React.Component {
       formattedDate = formatDate(date)
     }
     let location = this.props.user.location
+    let inProgress = this.props.user.inProgress
 
-    return (
+    if (inProgress) {
+      return (
         <tr>
           <td className='user-td'><a href={'https://www.twitter.com/' + screen_name}> {'@' + screen_name} </a></td>
           {
@@ -26,9 +29,34 @@ class SearchedUserItem extends React.Component {
           }
 
           <td className='user-td'>{location}</td>
-          <td className='user-td'>{this.props.user.polLabel}</td>
+          {
+            <td className='user-td' data-tip="Refresh to check if analysis is finished">
+              In progress...
+              <ReactTooltip place="top" type="dark" effect="solid"/>
+            </td>
+          }
         </tr>
-    )
+      )
+    } else {
+      return (
+        <tr>
+          <td className='user-td'><a href={'https://www.twitter.com/' + screen_name}> {'@' + screen_name} </a></td>
+          {
+            formattedDate ? <td className='user-td'>{formattedDate}</td> : null
+          }
+
+          <td className='user-td'>{location}</td>
+          {
+            this.props.user.polLabel === 'N/A' ?
+                <td className='user-td' data-tip="User does not have any tweets">
+                  {this.props.user.polLabel}
+                  <ReactTooltip place="top" type="dark" effect="solid"/>
+                </td>
+              : <td className='user-td'>{this.props.user.polLabel}</td>
+          }
+        </tr>
+      )
+    }
   }
 }
 
