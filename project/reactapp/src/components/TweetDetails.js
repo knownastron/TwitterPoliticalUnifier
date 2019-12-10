@@ -40,6 +40,18 @@ const dem = new L.Icon({
     className: 'leaflet-div-icon'
 });
 
+const na = new L.Icon({
+    iconUrl: require('../images/questionmark.png'),
+    iconRetinaUrl: require('../images/questionmark.png'),
+    iconAnchor: null,
+    popupAnchor: null,
+    shadowUrl: null,
+    shadowSize: null,
+    shadowAnchor: null,
+    iconSize: new L.Point(19, 19),
+    className: 'leaflet-div-icon'
+});
+
 class TweetDetails extends React.Component {
   state = {
     users: [],
@@ -146,21 +158,35 @@ class TweetDetails extends React.Component {
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'/>
               {
-                this.state.userInfoWithGeo.map((curUser, i) => (
-                  curUser.coordinates.error ? null :
-                    curUser.polLabel === 'conservative' ?
-                    <Marker key={i} icon={gop} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
-                          // <Popup>
-                          //   <img src='threelinebutton.png'></img>
-                          // </Popup>
-                    </Marker> :
-                    <Marker key={i} icon={dem} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
-                          // <Popup>
-                          //   <img src='threelinebutton.png'></img>
-                          // </Popup>
-                    </Marker>
-
-                ))
+                this.state.userInfoWithGeo.map((curUser, i) => {
+                  if (!curUser.coordinates.error) {
+                    switch(curUser.polLabel) {
+                      case 'conservative':
+                        return <Marker key={i} icon={gop} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
+                                {// <Popup>
+                                //   <img src='threelinebutton.png'></img>
+                                // </Popup>
+                                }
+                              </Marker>
+                      case 'liberal':
+                        return <Marker key={i} icon={dem} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
+                                {// <Popup>
+                                //   <img src='threelinebutton.png'></img>
+                                // </Popup>
+                                }
+                              </Marker>
+                      default:
+                        return <Marker key={i} icon={na} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
+                                {// <Popup>
+                                //   <img src='threelinebutton.png'></img>
+                                // </Popup>
+                                }
+                              </Marker>
+                    }
+                } else {
+                  return null;
+                }
+              })
               }
             </Map>
           </div>
@@ -168,8 +194,6 @@ class TweetDetails extends React.Component {
     )
   }
 }
-
-var muh_style = {'height': '400px', width: '100%'}
 
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
