@@ -2,7 +2,8 @@ import React from 'react'
 import { Auth } from "aws-amplify";
 import { Redirect } from 'react-router';
 import { connect } from 'react-redux';
-import { resetConfirmation } from '../actions/authActions'
+import { resetConfirmation } from '../actions/authActions';
+import axios from 'axios';
 
 
 class Verify extends React.Component {
@@ -14,7 +15,7 @@ class Verify extends React.Component {
 
   componentDidMount() {
     // reset user_not_confirmed
-    this.props.resetConfirmation()
+    this.props.resetConfirmation();
   }
 
   validateEmail = (email) => {
@@ -28,13 +29,14 @@ class Verify extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    Auth.confirmSignUp(this.state.email, this.state.code, {
+    await Auth.confirmSignUp(this.state.email, this.state.code, {
     // Optional. Force user confirmation irrespective of existing alias. By default set to True.
     }).then(data => {
       console.log(data);
       if (data === 'SUCCESS') {
         alert('Email confirmed, redirecting to dashboard');
-        this.setState({success: true})
+        this.createNewUser(this.state.email);
+        this.setState({success: true});
       }
     })
     .catch(err => console.log(err));
@@ -58,6 +60,17 @@ class Verify extends React.Component {
     });
   }
 
+  createNewUser = async (email) => {
+    const url = 'http://127.0.0.1:5000/api/2.0/createnewuser';
+    // const url = 'https://www.knownastron.com:6001/api/2.0/createnewuser';
+    await axios.post(url, JSON.stringify({
+      email: this.state.email,
+    }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
+    .then((response) => {
+      // console.log(response)
+    })
+  }
+
   render() {
     if (this.state.success === false) {
       return (
@@ -69,7 +82,7 @@ class Verify extends React.Component {
               id="emailInput"
               name="email"
               placeholder="Email Address"
-              value={this.props.email}
+              value={this.state.email}
               onChange={this.onChange}/>
 
             <label htmlFor="code">Verification Code</label>
@@ -87,7 +100,7 @@ class Verify extends React.Component {
       );
     } else {
       return (
-        <Redirect to="/" />
+        <Redirect to="/home" />
       )
     }
   }
