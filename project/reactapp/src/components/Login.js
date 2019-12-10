@@ -41,7 +41,6 @@ class Login extends React.Component {
     this.setState({createNewUser: true})
   }
 
-
   render() {
     if (this.props.isAuthenticated) {
       return (< Redirect to="/dashboard" />)
