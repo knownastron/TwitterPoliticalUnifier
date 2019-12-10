@@ -44,6 +44,10 @@
   /* border-radius: 4px; */
 }
 
+.dropdown-item {
+  width: 100%;
+}
+
 .title {
   font-family: SFDisplay;
   float: left;
@@ -68,4 +72,11 @@
 /* Float the link section to the right */
 .header-right {
   float: right;
+}
+
+@media only screen and (max-width: 600px) {
+  #header-content {
+    width: 100%;
+    margin: 0 auto;
+  }
 }
