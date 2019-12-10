@@ -37,14 +37,14 @@ class Header extends React.Component {
               <DropdownToggle style={{backgroundColor: '#323232', border: 'none'}}>
                 <img src={require("../images/threelinebutton.png")} id='three-line' alt=''/>
               </DropdownToggle>
-              <DropdownMenu >
-                <DropdownItem><Link to="/home">Home</Link></DropdownItem>
-                <DropdownItem><Link to="/dashboard">Dashboard</Link></DropdownItem>
-                <DropdownItem><Link to="/about">About</Link></DropdownItem>
+              <DropdownMenu right>
+                <DropdownItem><Link className="dropdown-item" to="/home">Home</Link></DropdownItem>
+                <DropdownItem><Link className="dropdown-item" to="/dashboard">Dashboard</Link></DropdownItem>
+                <DropdownItem><Link className="dropdown-item" to="/about">About</Link></DropdownItem>
                 <DropdownItem>{
                   this.props.isAuthenticated ?
-                  <Link to="/" onClick={this.onLogout}>Logout</Link>
-                  : <Link to="/login">Login</Link>
+                  <Link className="dropdown-item" to="/" onClick={this.onLogout}>Logout</Link>
+                  : <Link className="dropdown-item" to="/login">Login/Register</Link>
                 }</DropdownItem>
               </DropdownMenu>
             </Dropdown>
