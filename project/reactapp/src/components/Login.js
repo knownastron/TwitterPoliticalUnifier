@@ -60,7 +60,6 @@ class Login extends React.Component {
               placeholder="Email Address"
               onChange={this.onChange}/>
 
-
             <label htmlFor="password">Password</label>
             <input type="password"
               id="passwordInput"
