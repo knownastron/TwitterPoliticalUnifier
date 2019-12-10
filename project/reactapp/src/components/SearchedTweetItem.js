@@ -1,7 +1,8 @@
-import React from 'react'
+import React from 'react';
 import {
   Link
-} from "react-router-dom"
+} from "react-router-dom";
+import ReactTooltip from 'react-tooltip';
 
 class SearchedTweetItem extends React.Component {
   state = {
@@ -23,7 +24,17 @@ class SearchedTweetItem extends React.Component {
           <td className='user-td'><a href={'https://www.twitter.com/' + screen_name} > {'@' + screen_name} </a></td>
           <td className='user-td'><a href={'https://twitter.com/' + screen_name + '/status/' + tweetId}>Go to Tweet</a></td>
           <td className='user-td'>{formattedDate}</td>
-          <td className='user-td'>{ inProgress ? 'In progress...' : <Link to={'/tweetdetails/' + tweetId}>Details</Link>}</td>
+          {
+            inProgress ?
+              <td className='user-td' data-tip="Refresh to check if analysis is finished">
+                In progress...
+                <ReactTooltip place="top" type="dark" effect="solid"/>
+              </td>
+            :
+            <td className='user-td'>
+              <Link to={'/tweetdetails/' + tweetId}>Details</Link>
+            </td>
+          }
         </tr>
     )
   }
