@@ -9,7 +9,8 @@ class Login extends React.Component {
     email: '',
     password: '',
     toConfirm: false,
-    isLoggedIn: false
+    isLoggedIn: false,
+    createNewUser: false
   };
 
   validateEmail = (email) => {
@@ -35,12 +36,19 @@ class Login extends React.Component {
     console.log(this.props.isAuthenticated);
   }
 
+  newAccount = e => {
+    e.preventDefault();
+    this.setState({createNewUser: true})
+  }
+
 
   render() {
     if (this.props.isAuthenticated) {
       return (< Redirect to="/dashboard" />)
     } else if (this.props.confirmationRequired) {
       return (< Redirect to="/verify" />)
+    } else if (this.state.createNewUser) {
+      return (<Redirect to="/register" />)
     } else if (!this.state.toConfirm) {
       return (
         <div className="component-main-div">
@@ -53,6 +61,7 @@ class Login extends React.Component {
               placeholder="Email Address"
               onChange={this.onChange}/>
 
+
             <label htmlFor="password">Password</label>
             <input type="password"
               id="passwordInput"
@@ -60,12 +69,14 @@ class Login extends React.Component {
               placeholder="Password"
               onChange={this.onChange}/>
             <input type="submit" value="Submit" />
+            <p>
+              <button className="link" onClick={this.newAccount}>Don't have an account? Create one now.</button>
+            </p>
           </form>
         </div>
       );
-    } else {
-      return (<Redirect to="/verify" />)
     }
+
 
   }
 }
