@@ -248,7 +248,7 @@ def create_new_user():
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
-        'status': 404,
+        'statusCode': 404,
         'message': 'Not Found: ' + request.url,
     }
     resp = jsonify(message)
