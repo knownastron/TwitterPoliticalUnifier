@@ -16,7 +16,6 @@ export const loginUser = (loginInfo) => async dispatch => {
       payload: user,
       authenticatedUser: true,
     })
-    alert("Logged in");
   }).catch(err => {
     if (err.code === 'UserNotConfirmedException') {
       dispatch({
