@@ -42,7 +42,7 @@ class LabelTweet extends React.Component {
     const url = 'http://127.0.0.1:5000/api/2.0/labeltweet';
 
     axios.post(url, JSON.stringify({
-        ...this.state,
+        tweeturl: this.state.tweeturl,
         token: this.props.token,
         email: this.props.email,
         tweetId: this.state.tweeturl.split('/')[5]
