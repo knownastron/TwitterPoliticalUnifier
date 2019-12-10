@@ -1,7 +1,9 @@
 import React from 'react'
 import { Auth } from 'aws-amplify';
 // import { Link } from "react-router-dom";
-import { Redirect } from "react-router"
+import { Redirect } from "react-router";
+import { connect } from 'react-redux';
+// import { setEmail } from '../actions/authActions';
 
 class SignUp extends React.Component {
   state = {
@@ -9,7 +11,6 @@ class SignUp extends React.Component {
     password1: '',
     password2: '',
     toVerify: false,
-    success: false
   };
 
   validateEmail = (email) => {
@@ -43,37 +44,18 @@ class SignUp extends React.Component {
       this.state.password1
     )
     .then(data => {
-      this.setState({toVerify: true})
-      console.log(data)
+      this.setState({toVerify: true});
+      // console.log(data)
     })
     .catch((err) => {
       if (err.code === 'UsernameExistsException') {
         alert('Email/username already exists');
       }
-
     });
-  }
-
-  handleVerifySubmit = async (e) => {
-    e.preventDefault();
-    Auth.confirmSignUp(this.state.email, this.state.code, {
-    // Optional. Force user confirmation irrespective of existing alias. By default set to True.
-    }).then(data => {
-      console.log(data);
-      if (data === 'SUCCESS') {
-        alert('Email confirmed, redirecting to login');
-        this.setState({success: true});
-      }
-
-    })
-    .catch(err => console.log(err));
   }
 
   render() {
     if (this.state.toVerify === false) {
-      if (this.state.success) {
-        return (<Redirect to="/login" />);
-      }
       return (
         <div className="component-main-div">
           <h2> Register New User </h2>
@@ -104,12 +86,10 @@ class SignUp extends React.Component {
       );
     } else {
       return (
-        <Redirect to='/Verify' />
+        (<Redirect to='/verify'/>)
       )
     }
   }
 }
-
-//.userConfirmed
 
 export default SignUp;
