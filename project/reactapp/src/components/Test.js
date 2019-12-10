@@ -1,42 +1,62 @@
 import React from 'react';
 import { Auth } from 'aws-amplify';
-import { TwitterTweetEmbed } from 'react-twitter-embed'
+import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css';
+// import 'leaflet/dist/leaflet.css';
+// const { MLeafletMap, TileLayer, Marker, Popup } = ReactLeaflet
+import L from 'leaflet';
+import SearchedTweets from './SearchedTweets';
+import LabelUser from './LabelUser'
+import ReactTooltip from 'react-tooltip'
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
 
 class Test extends React.Component {
-  onClick = (e) => {
-    e.preventDefault();
-    Auth.currentAuthenticatedUser({
-      bypassCache: false
-    }).then(user => console.log(user))
-    .catch(err => console.log(err));
+  constructor() {
+    super()
+    this.state = {
+      lat: 39.8283,
+      lng: -98.5795,
+      zoom: 4
+    }
   }
 
-
   render() {
+    const position = [this.state.lat, this.state.lng];
     return (
-      <div id="test-div">
-        <TwitterTweetEmbed options={
-            {
-              width: 300,
-              cards: 'hidden'
-            }
-          }
-          tweetId={'1000000245584072704'}
-        />
-        <TwitterTweetEmbed
-          tweetId={'1194120382413803520'}
-          options={
+      <div>
+        <table className="user-table">
+            <tbody>
+              <tr>
+                <th className='user-th'>Username</th>
+                <th className='user-th'>Date Searched</th>
+                <th className='user-th'>Location</th>
+                <th className='user-th'>Political Prediction</th>
+              </tr>
+            <tr>
+              <td><a>duhhello1</a></td>
               {
-                width: 300,
-                cards: 'hidden'
+                <td className='user-td'>date</td>
               }
-            }
-        />
+
+              <td className='user-td'>location</td>
+                <td className='user-td' data-tip="React-tooltip">duuhello</ td>
+                <ReactTooltip place="top" type="dark" effect="solid"/>
+
+            </tr>
+          </tbody>
+        </ table>
       </div>
     );
-  };
+  }
 }
 
-var muh_style = {'height': '100px'}
+var muh_style = {'height': '400px', width: '100%'}
 
 export default Test;
