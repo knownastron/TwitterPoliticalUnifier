@@ -3,16 +3,14 @@ import './App.css';
 
 import Header from './components/Header'
 import About from './components/About'
-import LabelUser from './components/LabelUser'
-import LabelTweet from './components/LabelTweet'
 import Login from './components/Login'
 import SignUp from './components/SignUp'
 import Verify from './components/Verify'
 import Test from './components/Test'
-import SearchedUsers from './components/SearchedUsers'
-import SearchedTweets from './components/SearchedTweets'
+import Dashboard from './components/Dashboard'
 import TweetDetails from './components/TweetDetails'
 import LandingPage from './components/LandingPage'
+import Home from './components/Home'
 import {
   BrowserRouter as Router,
   Switch,
@@ -34,14 +32,15 @@ function App() {
               <LandingPage />
             </Route>
             <Route path="/home">
-              <LabelTweet />
-              <LabelUser />
+              <Home />
             </Route>
             <Route path="/about">
               <About />
             </Route>
             <Route path="/login">
               <Login />
+            </Route>
+            <Route path="/register">
               <SignUp />
             </Route>
             <Route path="/verify">
@@ -51,8 +50,7 @@ function App() {
               <Test/>
             </Route>
             <Route path="/dashboard">
-              <SearchedUsers />
-              <SearchedTweets />
+              <Dashboard />
             </Route>
             <Route path="/tweetdetails/:id" component={TweetDetails} />
           </Switch>
