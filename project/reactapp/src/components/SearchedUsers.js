@@ -12,9 +12,8 @@ class SearchedUsers extends React.Component {
     const url = 'http://127.0.0.1:5000/api/2.0/getsearchedusers';
     let self = this;
     axios.post(url, JSON.stringify({
-      // 'token': token
-      // 'email': this.props.email
-      'email': 'knownastron@gmail.com'
+      'token': this.props.token,
+      'email': this.props.email
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
     .then(function(response) {
       console.log(response.data.searchedUsers)
