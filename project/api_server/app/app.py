@@ -15,7 +15,12 @@ import joblib
 app = Flask(__name__)
 CORS(app) # set up CORS
 
+@app.before_request
+def before_request():
+    if request.url.startswith('http://'):
+        return redirect(request.url.replace('http://', 'https://'), code=301)
 
+    
 @app.route('/')
 @app.route('/index')
 def index():
@@ -273,5 +278,5 @@ if __name__ == '__main__':
     context = ('/etc/letsencrypt/live/knownastron.com/fullchain.pem',
                '/etc/letsencrypt/live/knownastron.com/privkey.pem')
 
-    # app.run(threaded=True, host='0.0.0.0', port=6001, ssl_context=context)
-    app.run(debug="True", threaded=True)
+    app.run(threaded=True, host='0.0.0.0', ssl_context=context)
+    # app.run(debug="True", threaded=True)
