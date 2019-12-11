@@ -88,17 +88,17 @@ class TweetDetails extends React.Component {
   getTwitterUsers = async () => {
     // const url = 'http://127.0.0.1:5000/api/2.0/gettweetlikes';
     const url = 'https://www.knownastron.com/api/2.0/gettweetlikes';
-      
-    let self = this;
+    
+      console.log('about to axios');
     await axios.post(url, JSON.stringify({
       'token': this.props.token,
-      // 'email': this.props.email
       'tweetId': this.props.match.params.id,
       'email': 'knownastron@gmail.com'
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
-    .then(function(response) {
-      self.setState({users: response.data.tweetLikes})
-    })
+	  .then(function(response) {
+	      console.log(response.data.tweetLikes);
+	      self.setState({users: response.data.tweetLikes})
+	  })
     .catch(function (error) {
       console.log(error)
     });
