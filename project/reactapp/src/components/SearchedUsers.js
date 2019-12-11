@@ -10,14 +10,13 @@ class SearchedUsers extends React.Component {
   componentDidMount() {
     const url = 'https://www.knownastron.com:6001/api/2.0/getsearchedusers';
       // const url = 'http://127.0.0.1:5000/api/2.0/getsearchedusers';
-      
+
     let self = this;
     axios.post(url, JSON.stringify({
       'token': this.props.token,
       'email': this.props.email
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
     .then(function(response) {
-      console.log(response.data.searchedUsers)
       self.setState({users: response.data.searchedUsers})
     })
     .catch(function (error) {
