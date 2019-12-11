@@ -15,7 +15,6 @@ export default function(state = initialState, action) {
   switch (action.type) {
 
     case LOGIN_USER_SUCCESS:
-      console.log('reducer')
       return {
         ...state,
         token: action.payload.signInUserSession.idToken.jwtToken,
