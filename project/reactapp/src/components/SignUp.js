@@ -43,7 +43,6 @@ class SignUp extends React.Component {
     )
     .then(data => {
       this.setState({toVerify: true});
-      // console.log(data)
     })
     .catch((err) => {
       if (err.code === 'UsernameExistsException') {
