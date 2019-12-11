@@ -1,9 +1,7 @@
 import React from 'react'
 import { Auth } from 'aws-amplify';
-// import { Link } from "react-router-dom";
 import { Redirect } from "react-router";
-import { connect } from 'react-redux';
-// import { setEmail } from '../actions/authActions';
+
 
 class SignUp extends React.Component {
   state = {

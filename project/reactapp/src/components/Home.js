@@ -2,7 +2,6 @@ import React from 'react'
 import LabelTweet from './LabelTweet';
 import LabelUser from './LabelUser'
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router';
 
 class Home extends React.Component {
 

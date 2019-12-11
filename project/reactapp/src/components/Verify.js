@@ -61,8 +61,9 @@ class Verify extends React.Component {
   }
 
   createNewUser = async (email) => {
-    const url = 'http://127.0.0.1:5000/api/2.0/createnewuser';
-    // const url = 'https://www.knownastron.com:6001/api/2.0/createnewuser';
+    //const url = 'http://127.0.0.1:5000/api/2.0/createnewuser';
+    const url = 'https://www.knownastron.com:6001/api/2.0/createnewuser';
+      
     await axios.post(url, JSON.stringify({
       email: this.state.email,
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
