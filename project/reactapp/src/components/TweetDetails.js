@@ -95,11 +95,11 @@ class TweetDetails extends React.Component {
       'tweetId': this.props.match.params.id,
       'email': 'knownastron@gmail.com'
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
-	  .then(function(response) {
+	  .then((response) => {
 	      console.log(response.data.tweetLikes);
-	      self.setState({users: response.data.tweetLikes})
+	      this.setState({users: response.data.tweetLikes})
 	  })
-    .catch(function (error) {
+    .catch((error) => {
       console.log(error)
     });
 
@@ -124,7 +124,7 @@ class TweetDetails extends React.Component {
         })
       })
     console.log(userInfoAndGeo);
-    self.setState({userInfoWithGeo: userInfoAndGeo})
+    this.setState({userInfoWithGeo: userInfoAndGeo})
   }
 
 
