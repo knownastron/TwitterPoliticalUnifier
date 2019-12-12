@@ -101,7 +101,7 @@ class TweetDetails extends React.Component {
     await axios.post(url, JSON.stringify({
       'token': this.props.token,
       'tweetId': this.props.match.params.id,
-      'email': 'this.props.email'
+      'email': this.props.email
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
 	  .then((response) => {
 	      console.log(response.data.tweetLikes);
