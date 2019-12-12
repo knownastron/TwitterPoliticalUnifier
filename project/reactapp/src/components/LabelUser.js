@@ -58,8 +58,8 @@ class LabelUser extends React.Component {
     }
     return (
       <div className="component-half-div">
-        <h2> Twitter User's Political Affiliation </h2>
-        <p> Discover a Twitter user's political leanings <br/> based on their tweet history</p>
+        <h2> Twitter User Political Affiliation </h2>
+        <p> Discover a Twitter user's political leanings based on their tweet history</p>
         <form onSubmit={this.submission}>
           <label htmlFor="username">Twitter Username</label>
           <input type="text"
