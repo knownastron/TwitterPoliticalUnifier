@@ -149,7 +149,7 @@ def get_searched_users():
 
 
 @app.route('/api/2.0/labeluser', methods=['POST'])
-def predictUser2():
+def predict_user2():
     data = request.get_json()
     email = data['email']
     auth = Authentication.verify_jwt(data, email)
@@ -164,7 +164,7 @@ def predictUser2():
     return resp
 
 @app.route('/api/2.0/labeltweet', methods=['POST'])
-def predictTweet2():
+def predict_tweet2():
     data = request.get_json()
     email = data['email']
     auth = Authentication.verify_jwt(data, email)
@@ -247,6 +247,21 @@ def create_new_user():
     Tasks.create_new_user.apply_async([email])
 
     resp = {'status_code': 200}
+    return resp
+
+
+@app.route('/api/3.0/labeltweet', methods=['POST'])
+def predict_tweet3():
+    data = request.get_json()
+    email = data['email']
+    auth = Authentication.verify_jwt(data, email)
+
+    if not auth:
+        return jsonify({'statusCode': 401,
+                        'message': 'Authentication Error'})
+
+    task = Tasks.predict_tweet_tweepy.apply_async([data['email'], data['tweetId']])
+    resp = {'status_code': 200, 'task_id': task.id}
     return resp
 
 
