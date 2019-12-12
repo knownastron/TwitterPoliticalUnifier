@@ -6,7 +6,7 @@ import { Auth } from 'aws-amplify';
 
 export const loginUser = (loginInfo) => async dispatch => {
   await Auth.signIn(
-    loginInfo.email,
+      loginInfo.email.toLowerCase(),
     loginInfo.password
   ).then(user => {
     console.log(user);

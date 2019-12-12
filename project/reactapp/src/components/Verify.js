@@ -32,7 +32,8 @@ class Verify extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    await Auth.confirmSignUp(this.state.email, this.state.code, {
+      await Auth.confirmSignUp(this.state.email.toLowerCase(),
+			       this.state.code, {
     // Optional. Force user confirmation irrespective of existing alias. By default set to True.
     }).then(data => {
       console.log(data);
@@ -67,7 +68,7 @@ class Verify extends React.Component {
     const url = 'https://www.knownastron.com:6001/api/2.0/createnewuser';
 
     await axios.post(url, JSON.stringify({
-      email: this.state.email,
+	email: this.state.email.toLowerCase(),
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
     .then((response) => {
       // console.log(response)
