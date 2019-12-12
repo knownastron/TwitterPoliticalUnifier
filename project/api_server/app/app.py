@@ -265,6 +265,22 @@ def predict_tweet3():
     return resp
 
 
+@app.route('/api/3.0/labeluser', methods=['POST'])
+def predict_user3():
+    data = request.get_json()
+    email = data['email']
+    auth = Authentication.verify_jwt(data, email)
+
+    if not auth:
+        return jsonify({'statusCode': 401,
+                        'message': 'Authentication Error'})
+
+    task = Tasks.predict_user_tweepy.apply_async([data['username'], data['email']])
+
+    resp = {'status_code': 200, 'task_id': task.id}
+    return resp
+
+
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
