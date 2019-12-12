@@ -45,7 +45,7 @@ class TwitterConnection:
 
     def get_tweets(self, screen_name, count=200):
         """
-        Gets tweets using the Twitter API. 
+        Gets tweets using the Twitter API.
         note: 900 requests of count (max 3200) per 15 mins
         :param screen_name:
         :param count:
