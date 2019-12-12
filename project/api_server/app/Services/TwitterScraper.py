@@ -68,7 +68,7 @@ class TwitterSearch(object):
                             max_position = "TWEET-%s-%s" % (max_tweet['tweet_id'], min_tweet['tweet_id'])
                         url = self.construct_url(query, max_position=max_position)
                         # Sleep for our rate_delay
-                        print('.')
+                        print('.', end=' ')
                         sleep(self.rate_delay)
                         response = self.execute_search(url)
 
