@@ -10,6 +10,8 @@ import L from 'leaflet';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
+let develop = true;
+
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
     iconUrl: require('leaflet/dist/images/marker-icon.png'),
@@ -86,14 +88,20 @@ class TweetDetails extends React.Component {
   }
 
   getTwitterUsers = async () => {
-    // const url = 'http://127.0.0.1:5000/api/2.0/gettweetlikes';
-    const url = 'https://www.knownastron.com:6001/api/2.0/gettweetlikes';
+    let url = '';
+
+    if (develop) {
+      url = 'http://127.0.0.1:5000/api/2.0/gettweetlikes';
+    } else {
+      url = 'https://www.knownastron.com:6001/api/2.0/gettweetlikes';
+    }
+    //
 
       console.log('about to axios');
     await axios.post(url, JSON.stringify({
       'token': this.props.token,
       'tweetId': this.props.match.params.id,
-      'email': 'knownastron@gmail.com'
+      'email': 'this.props.email'
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
 	  .then((response) => {
 	      console.log(response.data.tweetLikes);
