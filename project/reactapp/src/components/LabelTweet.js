@@ -62,7 +62,7 @@ class LabelTweet extends React.Component {
     return (
       <div className="component-half-div">
         <h2> Tweet Polarization </h2>
-        <p> Discover a Tweet's polarization based on the users who liked the tweet</p>
+        <p> Discover a Tweet's polarization based on the political leanings of users who liked the tweet</p>
         <form onSubmit={this.submission}>
 
           <label htmlFor="tweeturl">Tweet URL</label>
