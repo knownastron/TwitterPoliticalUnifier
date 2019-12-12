@@ -264,12 +264,13 @@ def remove_tweet_from_running_tasks(app_user_email, screen_name, tweet_id, text,
 def get_tweets(user_obj):
     try:
         search_query = "from:" + user_obj.screen_name
+        print('Searching for', user_obj.screen_name)
         twit_scraper.search(search_query)
 
         tweets = twit_scraper.get_tweets()
         raw_tweets = twit_scraper.get_raw_tweets()
         tweets_joined = ' '.join(raw_tweets)
-        print('GOT TWEETS')
+        print('GOT TWEETS ' + str(len(tweets)))
 
         prediction = 'N/A'
         if len(tweets) != 0:
@@ -279,7 +280,7 @@ def get_tweets(user_obj):
 
             vectorized_text = vectorizer.transform([cleaned_text])
             prediction = clf.predict(vectorized_text)[0]
-            print('PREDICTED', prediction)
+            print('PREDICTED ' + prediction)
 
         with aws_lock:
             aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
