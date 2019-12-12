@@ -154,14 +154,10 @@ def predict_user(screen_name, app_user_email):
 
         user_obj = twit_conn.get_user_objects([screen_name])[0]
 
-        try:
-            get_tweets(user_obj)
+        with aws_lock:
+            aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+        print('WROTE SEARCHED')
 
-            with aws_lock:
-                aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
-            print('WROTE SEARCHED')
-        finally:
-            twit_scraper.clear_tweets()
     finally:
         # removes the current task from the user tasks
         remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search)
@@ -216,6 +212,42 @@ def predict_tweet(app_user_email, tweet_id):
         remove_tweet_from_running_tasks(app_user_email, status['screen_name'], status['id'], status['text'], time_of_search)
 
     return {'status': 'new tweet'}
+
+
+@celery.task()
+def predict_user_tweepy(screen_name, app_user_email):
+    time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    with label_user_task_lock:
+        if app_user_email in running_user_tasks:
+            for (cur_screen_name, cur_time) in running_user_tasks[app_user_email]:
+                if cur_screen_name == screen_name:
+                    return {'status': 'already in progress'}
+            add_label_user_task_to_queue(app_user_email, screen_name, time_of_search)
+        else:
+            running_user_tasks[app_user_email] = [(screen_name, time_of_search)]
+
+    try:
+        with aws_lock:
+            cur_user = aws_conn.get_twitter_user(screen_name)
+
+        if cur_user:
+            with aws_lock:
+                aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+            remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search)
+            return {'status': 'user already scraped'}
+
+        user_obj = twit_conn.get_user_objects([screen_name])[0]
+
+        get_tweets_tweepy(user_obj)
+
+        with aws_lock:
+            aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+        print('WROTE SEARCHED')
+    finally:
+        # removes the current task from the user tasks
+        remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search)
+    return {'status': 'added new user'}
 
 
 @celery.task()
@@ -317,62 +349,57 @@ def remove_tweet_from_running_tasks(app_user_email, screen_name, tweet_id, text,
 
 
 def get_tweets(user_obj):
-    try:
-        search_query = "from:" + user_obj.screen_name
-        print('Searching for: ' +user_obj.screen_name)
-        twit_scraper.search(search_query)
+    search_query = "from:" + user_obj.screen_name
+    print('Searching for: ' +user_obj.screen_name)
+    twit_scraper.search(search_query)
 
-        tweets = twit_scraper.get_tweets()
-        raw_tweets = twit_scraper.get_raw_tweets()
-        tweets_joined = ' '.join(raw_tweets)
-        print('GOT TWEETS ' + str(len(tweets)))
+    tweets = twit_scraper.get_tweets()
+    raw_tweets = twit_scraper.get_raw_tweets()
+    tweets_joined = ' '.join(raw_tweets)
+    print('GOT TWEETS ' + str(len(tweets)))
 
-        prediction = 'N/A'
-        if len(tweets) != 0:
-            cleaned_text = Format.Format.denoise_tweet(tweets_joined)
-            cleaned_text = Format.Format.stem_words_str(cleaned_text)
-            print('CLEANED TWEETS')
+    prediction = 'N/A'
+    if len(tweets) != 0:
+        cleaned_text = Format.Format.denoise_tweet(tweets_joined)
+        cleaned_text = Format.Format.stem_words_str(cleaned_text)
+        print('CLEANED TWEETS')
 
-            vectorized_text = vectorizer.transform([cleaned_text])
-            prediction = clf.predict(vectorized_text)[0]
-            print('PREDICTED ' + prediction)
+        vectorized_text = vectorizer.transform([cleaned_text])
+        prediction = clf.predict(vectorized_text)[0]
+        print('PREDICTED ' + prediction)
 
-        with aws_lock:
-            aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
-        print('WROTE NEW USER')
+    with aws_lock:
+        aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
+    print('WROTE NEW USER')
 
-        with aws_lock:
-            aws_conn.write_tweets(tweets)
-        print('WROTE TWEETS')
-    finally:
-        twit_scraper.clear_tweets()
+    with aws_lock:
+        aws_conn.write_tweets(tweets)
+    print('WROTE TWEETS')
 
 
 def get_tweets_tweepy(user_obj):
-    try:
-        print('Searching for: ' + user_obj.screen_name)
+    print('Searching for: ' + user_obj.screen_name)
 
-        tweets = twit_conn.get_tweets(user_obj.screen_name)
-        raw_tweets = [tweet.text for tweet in tweets]
-        tweets_joined = ' '.join(raw_tweets)
-        print('GOT TWEETS ' + str(len(tweets)))
+    tweets = twit_conn.get_tweets(user_obj.screen_name)
+    raw_tweets = [tweet.text for tweet in tweets]
+    tweets_joined = ' '.join(raw_tweets)
+    print('GOT TWEETS ' + str(len(tweets)))
 
-        prediction = 'N/A'
-        if len(tweets) != 0:
-            cleaned_text = Format.Format.denoise_tweet(tweets_joined)
-            cleaned_text = Format.Format.stem_words_str(cleaned_text)
-            print('CLEANED TWEETS')
+    prediction = 'N/A'
+    if len(tweets) != 0:
+        cleaned_text = Format.Format.denoise_tweet(tweets_joined)
+        cleaned_text = Format.Format.stem_words_str(cleaned_text)
+        print('CLEANED TWEETS')
 
-            vectorized_text = vectorizer.transform([cleaned_text])
-            prediction = clf.predict(vectorized_text)[0]
-            print('PREDICTED ' + prediction)
+        vectorized_text = vectorizer.transform([cleaned_text])
+        prediction = clf.predict(vectorized_text)[0]
+        print('PREDICTED ' + prediction)
 
-        with aws_lock:
-            aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
-        print('WROTE NEW USER')
+    with aws_lock:
+        aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
+    print('WROTE NEW USER')
 
-        with aws_lock:
-            aws_conn.write_tweets_status(tweets)
-        print('WROTE TWEETS')
-    finally:
-        twit_scraper.clear_tweets()
+    with aws_lock:
+        aws_conn.write_tweets_status(tweets)
+    print('WROTE TWEETS')
+
