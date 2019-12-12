@@ -43,6 +43,19 @@ class TwitterConnection:
         self.auth.set_access_token(twitter_credentials.ACCESS_TOKEN, twitter_credentials.ACCESS_TOKEN_SECRET)
         self.api = API(self.auth)
 
+    def get_tweets(self, screen_name, count=200):
+        """
+        Gets tweets using the Twitter API. 
+        note: 900 requests of count (max 3200) per 15 mins
+        :param screen_name:
+        :param count:
+        :return:
+        """
+        tweets = []
+        for tweet in self.api.user_timeline(screen_name=screen_name, count=count):
+            tweets.append(tweet)
+        return tweets
+
     def get_tweet(self, tweet_id):
         """
         Returns the a dict with keys screen_name, id, text, created_at
