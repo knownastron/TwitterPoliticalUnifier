@@ -160,7 +160,7 @@ def predictUser2():
 
     task = Tasks.predict_user.apply_async([data['username'], data['email']])
 
-    resp = {'status_code': 401, 'task_id': task.id}
+    resp = {'status_code': 200, 'task_id': task.id}
     return resp
 
 @app.route('/api/2.0/labeltweet', methods=['POST'])
@@ -174,8 +174,8 @@ def predictTweet2():
                         'message': 'Authentication Error'})
 
     task = Tasks.predict_tweet.apply_async([data['email'], data['tweetId']])
-
-    return '202'
+    resp = {'status_code': 200, 'task_id': task.id}
+    return resp
 
 
 @app.route('/api/2.0/getsearchedtweets', methods=['POST'])
