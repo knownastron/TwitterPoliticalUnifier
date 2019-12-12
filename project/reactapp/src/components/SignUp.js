@@ -41,7 +41,8 @@ class SignUp extends React.Component {
       this.state.email,
       this.state.password1
     )
-    .then(data => {
+    .then((data) => {
+      alert('Check your email for the confirmation code');
       this.setState({toVerify: true});
     })
     .catch((err) => {
@@ -83,7 +84,13 @@ class SignUp extends React.Component {
       );
     } else {
       return (
-        (<Redirect to='/verify'/>)
+        <Redirect to= {{
+            pathname: '/verify',
+            state: {
+              email: this.state.email
+            }
+          }}
+        />
       )
     }
   }
