@@ -10,7 +10,7 @@ import L from 'leaflet';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
-let develop = true;
+let develop = false;
 
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
