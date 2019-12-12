@@ -96,6 +96,12 @@ class Format():
         return text.translate(str.maketrans('', '', string.punctuation + '—' + '“' + '…' + '\’' + '\”'))
 
     @staticmethod
+    def remove_rt(input_text_split):
+        input_text_split = [x for x in input_text_split if x != 'rt']
+        return input_text_split
+
+
+    @staticmethod
     def denoise_tweet(tweet_text):
         tweet_text = tweet_text.lower()
         tweet_text = Format.remove_hyperlinks(tweet_text)
@@ -106,6 +112,7 @@ class Format():
         tweet_text = Format.remove_new_line(tweet_text)
         tweet_text = Format.remove_punctuation(tweet_text)
         tweet_text_split = tweet_text.split()
+        tweet_text_split = Format.remove_rt(tweet_text_split)
         tweet_text_split = Format.remove_stopwords(tweet_text_split)
 
         return " ".join(tweet_text_split)
