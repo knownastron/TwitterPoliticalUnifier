@@ -155,6 +155,22 @@ class AWSConnection():
             tweet['created_at']))
         self.conn.commit()
 
+    def write_tweets_status(self, tweets):
+        """
+        tweets is a list of status objects
+        :param tweets:
+        :return:
+        """
+        sql = ''' INSERT IGNORE INTO Tweets(TweetId, Text, ScreenName, Date)
+              VALUES(%s, %s, %s, %s)'''
+        cur = self.conn.cursor()
+        cur._defer_warnings = True
+        for tweet in tweets:
+            cur.execute(sql, (
+                tweet.id, tweet.text, Format.Format.format_username(tweet.author.screen_name),
+                tweet.created_at))
+        self.conn.commit()
+
     def write_tweets_temp(self, tweets):
         """
         Used for moving sqlite data to mysql on AWS
