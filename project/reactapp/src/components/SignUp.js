@@ -38,7 +38,7 @@ class SignUp extends React.Component {
     }
 
     await Auth.signUp(
-      this.state.email,
+      this.state.email.toLowerCase(),
       this.state.password1
     )
     .then((data) => {
