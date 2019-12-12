@@ -264,7 +264,7 @@ def remove_tweet_from_running_tasks(app_user_email, screen_name, tweet_id, text,
 def get_tweets(user_obj):
     try:
         search_query = "from:" + user_obj.screen_name
-        print('Searching for', user_obj.screen_name)
+        print('Searching for: ' +user_obj.screen_name)
         twit_scraper.search(search_query)
 
         tweets = twit_scraper.get_tweets()
