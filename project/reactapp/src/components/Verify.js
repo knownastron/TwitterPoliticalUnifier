@@ -15,7 +15,9 @@ class Verify extends React.Component {
 
   componentDidMount() {
     // reset user_not_confirmed
-    this.setState({email: this.props.location.state.email})
+    if (this.props.location.state) {
+      this.setState({email: this.props.location.state.email})
+    }
     this.props.resetConfirmation();
   }
 
