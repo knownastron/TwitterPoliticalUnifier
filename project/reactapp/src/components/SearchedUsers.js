@@ -3,30 +3,22 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import SearchedUserItem from './SearchedUserItem';
 
-
-let develop = false;
-
 class SearchedUsers extends React.Component {
   state = {
     users: []
   }
+
   componentDidMount() {
-    let url = '';
-
-    if (develop) {
-      url = 'http://127.0.0.1:5000/api/2.0/getsearchedusers';
-    } else {
-      url = 'https://www.knownastron.com:6001/api/2.0/getsearchedusers';
-    }
-
+    // const url = 'http://127.0.0.1:5000/api/2.0/getsearchedusers';
+    const url = 'https://www.knownastron.com:6001/api/2.0/getsearchedusers';
 
     let self = this;
     axios.post(url, JSON.stringify({
       'token': this.props.token,
       'email': this.props.email
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
-    .then(function(response) {
-      self.setState({users: response.data.searchedUsers})
+    .then((response) => {
+      this.setState({users: response.data.searchedUsers})
     })
     .catch(function (error) {
       console.log(error)

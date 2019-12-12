@@ -3,21 +3,14 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import SearchedTweetItem from './SearchedTweetItem';
 
-let develop = false;
-
 class SearchedTweets extends React.Component {
   state = {
     tweets: []
   }
 
   componentDidMount() {
-    let url = '';
-
-    if (develop) {
-      url = 'https://www.knownastron.com:6001/api/2.0/getsearchedtweets';
-    } else {
-      url = 'http://127.0.0.1:5000/api/2.0/getsearchedtweets';
-    }
+    // const url = 'http://127.0.0.1:5000/api/2.0/getsearchedtweets';
+    const url = 'https://www.knownastron.com:6001/api/2.0/getsearchedtweets';
 
     let self = this;
 
