@@ -86,8 +86,8 @@ class TweetDetails extends React.Component {
   }
 
   getTwitterUsers = async () => {
-    // const url = 'http://127.0.0.1:6001/api/2.0/gettweetlikes';
-    const url = 'https://www.knownastron.com:5000/api/2.0/gettweetlikes';
+    // const url = 'http://127.0.0.1:5000/api/2.0/gettweetlikes';
+    const url = 'https://www.knownastron.com:6001/api/2.0/gettweetlikes';
 
       console.log('about to axios');
     await axios.post(url, JSON.stringify({
