@@ -43,8 +43,7 @@ function App() {
             <Route path="/register">
               <SignUp />
             </Route>
-            <Route path="/verify">
-              <Verify />
+            <Route path="/verify" component={Verify}>
             </Route>
             <Route path="/test">
               <Test/>
