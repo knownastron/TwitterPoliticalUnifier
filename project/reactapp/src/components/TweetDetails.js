@@ -77,7 +77,9 @@ class TweetDetails extends React.Component {
           if (geo.response.error) {
             geo_locations.push({'error': 'error'})
           } else {
-            geo_locations.push(geo.response.results[0].location)
+            if (geo.response.results[0]) {
+              geo_locations.push(geo.response.results[0].location)
+            }
           }
         }
       )
