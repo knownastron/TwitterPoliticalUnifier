@@ -234,7 +234,6 @@ def predict_user_tweepy(screen_name, app_user_email):
         if cur_user:
             with aws_lock:
                 aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
-            remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search)
             return {'status': 'user already scraped'}
 
         user_obj = twit_conn.get_user_objects([screen_name])[0]
@@ -271,7 +270,6 @@ def predict_tweet_tweepy(app_user_email, tweet_id):
             running_tweet_tasks[app_user_email] = [
                 (status['screen_name'], status['id'], status['text'], time_of_search)]
 
-    print(running_tweet_tasks)
     try:
         # checks if tweet has already been searched and predicted before
         with aws_lock:
