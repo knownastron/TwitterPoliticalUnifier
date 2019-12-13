@@ -1,6 +1,7 @@
 import sqlite3
 import pymysql
 from Services import Format
+from Config import mysql_aws_credentials
 
 
 class SQLConnection():
@@ -76,7 +77,11 @@ class LocalConnection(SQLConnection):
 
 class AWSConnection():
     def __init__(self, host, port, dbname, user, password):
-        self.conn = pymysql.connect(host, user=user, port=port, passwd=password, db=dbname)
+        self.conn = pymysql.connect(mysql_aws_credentials.HOST,
+                                    port=mysql_aws_credentials.PORT,
+                                    db=mysql_aws_credentials.DATABASE_NAME,
+                                    user=mysql_aws_credentials.USER,
+                                    passwd=mysql_aws_credentials.PASSWORD)
 
     '''
     TwitterUsers methods

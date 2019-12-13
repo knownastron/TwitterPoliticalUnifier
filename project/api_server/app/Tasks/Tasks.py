@@ -32,12 +32,6 @@ running_user_tasks = multiprocessing_manager.dict()  # {'email' : ('screen_name'
 label_tweet_task_lock = multiprocessing_manager.Lock()
 running_tweet_tasks = multiprocessing_manager.dict()  # {'email' : (tweet_id, time_of_search)}
 
-# Set up db
-aws_conn = SQLConnection.AWSConnection(mysql_aws_credentials.HOST, mysql_aws_credentials.PORT,
-                                       mysql_aws_credentials.DATABASE_NAME,
-                                       mysql_aws_credentials.USER, mysql_aws_credentials.PASSWORD)
-aws_lock = multiprocessing_manager.Lock()
-
 # Set up TwitterScrapper and TwitterConnection
 rate_delay_seconds = 15
 error_delay_seconds = 10
@@ -84,27 +78,26 @@ def long_task(self):
 
 @celery.task()
 def create_new_user(email):
-    # print('----------', 'entered create_new_user', '----------')
+    aws_conn = SQLConnection.AWSConnection()
     aws_conn.create_user_profile(email)
     return
 
 
 @celery.task()
 def get_searched_users(app_user_email):
-    # print('----------', 'entered get_searched_users', '----------')
+    aws_conn = SQLConnection.AWSConnection()
     searched_users = []
     if app_user_email in running_user_tasks:
         for task in running_user_tasks[app_user_email]:
             searched_users.append((task[0], None, str(task[1]), None, None, 'Pending...'))
-    with aws_lock:
-        searched_users.extend(aws_conn.get_searched_twitter_users(app_user_email))
+    searched_users.extend(aws_conn.get_searched_twitter_users(app_user_email))
     # print('******SEARCHED USERS****** ' + str(searched_users))
     return searched_users
 
 
 @celery.task()
 def get_searched_tweets(app_user_email):
-    # print('----------', 'entered get_searched_tweets', '----------')
+    aws_conn = SQLConnection.AWSConnection()
     searched_tweets = []
     with label_tweet_task_lock:
         if app_user_email in running_tweet_tasks:
@@ -112,8 +105,7 @@ def get_searched_tweets(app_user_email):
             in_progress = running_tweet_tasks[app_user_email]
             for tweet_task in in_progress:
                 searched_tweets.append((app_user_email, tweet_task[1], tweet_task[0], tweet_task[2], tweet_task[3], 'In progress...'))
-    with aws_lock:
-        db_tweets = aws_conn.get_searched_tweets_by_email(app_user_email)
+    db_tweets = aws_conn.get_searched_tweets_by_email(app_user_email)
     searched_tweets.extend(db_tweets)
     # print('******SEARCHED TWEETS****** ' + str(searched_tweets))
     return searched_tweets
@@ -121,15 +113,14 @@ def get_searched_tweets(app_user_email):
 
 @celery.task()
 def get_tweet_likes(tweet_id):
-    # print('----------', 'entered get_tweet_likes', '----------')
-    with aws_lock:
-        tweet_like_info = aws_conn.get_tweet_like_info(tweet_id)
+    aws_conn = SQLConnection.AWSConnection()
+    tweet_like_info = aws_conn.get_tweet_like_info(tweet_id)
     return tweet_like_info
 
 
 @celery.task()
 def predict_user(screen_name, app_user_email):
-    # print('----------', 'entered predict_user', '----------')
+    aws_conn = SQLConnection.AWSConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     with label_user_task_lock:
@@ -142,19 +133,16 @@ def predict_user(screen_name, app_user_email):
             running_user_tasks[app_user_email] = [(screen_name, time_of_search)]
 
     try:
-        with aws_lock:
-            cur_user = aws_conn.get_twitter_user(screen_name)
+        cur_user = aws_conn.get_twitter_user(screen_name)
 
         if cur_user:
-            with aws_lock:
-                aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+            aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
             remove_label_user_task_from_queue(app_user_email, screen_name, time_of_search)
             return {'status': 'user already scraped'}
 
         user_obj = twit_conn.get_user_objects([screen_name])[0]
 
-        with aws_lock:
-            aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+        aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
         print('WROTE SEARCHED')
 
     finally:
@@ -165,7 +153,7 @@ def predict_user(screen_name, app_user_email):
 
 @celery.task()
 def predict_tweet(app_user_email, tweet_id):
-    # print('----------', 'entered predict_tweet', '----------')
+    aws_conn = SQLConnection.AWSConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # from this point on use status
@@ -185,12 +173,10 @@ def predict_tweet(app_user_email, tweet_id):
     print(running_tweet_tasks)
     try:
         # checks if tweet has already been searched and predicted before
-        with aws_lock:
-            previous_tweet = aws_conn.get_searched_tweet_by_id(tweet_id) #status or False
+        previous_tweet = aws_conn.get_searched_tweet_by_id(tweet_id) #status or False
 
         if previous_tweet is not None:
-            with aws_lock:
-                aws_conn.insert_searched_tweet(app_user_email, previous_tweet[1], previous_tweet[2], previous_tweet[3], time_of_search)
+            aws_conn.insert_searched_tweet(app_user_email, previous_tweet[1], previous_tweet[2], previous_tweet[3], time_of_search)
             return {'status': 'tweet already searched'}
 
         likers = twit_conn.get_liked_list(tweet_id)
@@ -198,15 +184,13 @@ def predict_tweet(app_user_email, tweet_id):
         user_objects_likers = twit_conn.get_user_objects(likers)
         print('number of likers ' + str(len(user_objects_likers)))
         for liker in user_objects_likers:
-            with aws_lock:
-                does_user_exist = aws_conn.get_twitter_user(liker.screen_name.lower())
+            does_user_exist = aws_conn.get_twitter_user(liker.screen_name.lower())
             if does_user_exist is None:
-                get_tweets(liker)
+                get_tweets(liker, aws_conn)
             else:
                 continue
-        with aws_lock:
-            aws_conn.insert_searched_tweet(app_user_email, status['id'], status['screen_name'], status['text'], time_of_search)
-            aws_conn.insert_tweet_likes(likers, tweet_id)
+        aws_conn.insert_searched_tweet(app_user_email, status['id'], status['screen_name'], status['text'], time_of_search)
+        aws_conn.insert_tweet_likes(likers, tweet_id)
     finally:
         remove_tweet_from_running_tasks(app_user_email, status['screen_name'], status['id'], status['text'], time_of_search)
 
@@ -215,6 +199,7 @@ def predict_tweet(app_user_email, tweet_id):
 
 @celery.task()
 def predict_user_tweepy(screen_name, app_user_email):
+    aws_conn = SQLConnection.AWSConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     with label_user_task_lock:
@@ -227,20 +212,17 @@ def predict_user_tweepy(screen_name, app_user_email):
             running_user_tasks[app_user_email] = [(screen_name, time_of_search)]
 
     try:
-        with aws_lock:
-            cur_user = aws_conn.get_twitter_user(screen_name)
+        cur_user = aws_conn.get_twitter_user(screen_name)
 
         if cur_user:
-            with aws_lock:
-                aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+            aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
             return {'status': 'user already scraped'}
 
         user_obj = twit_conn.get_user_objects([screen_name])[0]
 
-        get_tweets_tweepy(user_obj)
+        get_tweets_tweepy(user_obj, aws_conn)
 
-        with aws_lock:
-            aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
+        aws_conn.insert_searched_twitter_user(app_user_email, screen_name, time_of_search)
         print('WROTE SEARCHED')
     finally:
         # removes the current task from the user tasks
@@ -250,7 +232,7 @@ def predict_user_tweepy(screen_name, app_user_email):
 
 @celery.task()
 def predict_tweet_tweepy(app_user_email, tweet_id):
-    # print('----------', 'entered predict_tweet', '----------')
+    aws_conn = SQLConnection.AWSConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # from this point on use status
@@ -271,12 +253,10 @@ def predict_tweet_tweepy(app_user_email, tweet_id):
 
     try:
         # checks if tweet has already been searched and predicted before
-        with aws_lock:
-            previous_tweet = aws_conn.get_searched_tweet_by_id(tweet_id)  # status or False
+        previous_tweet = aws_conn.get_searched_tweet_by_id(tweet_id)  # status or False
 
         if previous_tweet is not None:
-            with aws_lock:
-                aws_conn.insert_searched_tweet(app_user_email, previous_tweet[1], previous_tweet[2], previous_tweet[3],
+            aws_conn.insert_searched_tweet(app_user_email, previous_tweet[1], previous_tweet[2], previous_tweet[3],
                                                time_of_search)
             return {'status': 'tweet already searched'}
 
@@ -285,16 +265,14 @@ def predict_tweet_tweepy(app_user_email, tweet_id):
         user_objects_likers = twit_conn.get_user_objects(likers)
         print('number of likers ' + str(len(user_objects_likers)))
         for liker in user_objects_likers:
-            with aws_lock:
-                does_user_exist = aws_conn.get_twitter_user(liker.screen_name.lower())
+            does_user_exist = aws_conn.get_twitter_user(liker.screen_name.lower())
             if does_user_exist is None:
-                get_tweets_tweepy(liker)
+                get_tweets_tweepy(liker, aws_conn)
             else:
                 continue
-        with aws_lock:
-            aws_conn.insert_searched_tweet(app_user_email, status['id'], status['screen_name'], status['text'],
+        aws_conn.insert_searched_tweet(app_user_email, status['id'], status['screen_name'], status['text'],
                                            time_of_search)
-            aws_conn.insert_tweet_likes(likers, tweet_id)
+        aws_conn.insert_tweet_likes(likers, tweet_id)
     finally:
         remove_tweet_from_running_tasks(app_user_email, status['screen_name'], status['id'], status['text'],
                                         time_of_search)
@@ -345,9 +323,9 @@ def remove_tweet_from_running_tasks(app_user_email, screen_name, tweet_id, text,
         running_tweet_tasks[app_user_email] = in_progress_for_user
 
 
-def get_tweets(user_obj):
+def get_tweets(user_obj, aws_conn):
     search_query = "from:" + user_obj.screen_name
-    print('Searching for: ' +user_obj.screen_name)
+    print('Searching for: ' + user_obj.screen_name)
     twit_scraper.search(search_query)
 
     tweets = twit_scraper.get_tweets()
@@ -365,16 +343,14 @@ def get_tweets(user_obj):
         prediction = clf.predict(vectorized_text)[0]
         print('PREDICTED ' + prediction)
 
-    with aws_lock:
-        aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
+    aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
     print('WROTE NEW USER')
 
-    with aws_lock:
-        aws_conn.write_tweets(tweets)
+    aws_conn.write_tweets(tweets)
     print('WROTE TWEETS')
 
 
-def get_tweets_tweepy(user_obj):
+def get_tweets_tweepy(user_obj, aws_conn):
     print('Searching for: ' + user_obj.screen_name)
 
     tweets = twit_conn.get_tweets(user_obj.screen_name)
