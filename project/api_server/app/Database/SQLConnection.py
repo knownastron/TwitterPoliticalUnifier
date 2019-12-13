@@ -76,7 +76,7 @@ class LocalConnection(SQLConnection):
 
 
 class AWSConnection():
-    def __init__(self, host, port, dbname, user, password):
+    def __init__(self):
         self.conn = pymysql.connect(mysql_aws_credentials.HOST,
                                     port=mysql_aws_credentials.PORT,
                                     db=mysql_aws_credentials.DATABASE_NAME,

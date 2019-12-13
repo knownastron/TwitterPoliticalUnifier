@@ -346,8 +346,8 @@ def get_tweets(user_obj, aws_conn):
     aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
     print('WROTE NEW USER')
 
-    aws_conn.write_tweets(tweets)
-    print('WROTE TWEETS')
+    # aws_conn.write_tweets(tweets)
+    # print('WROTE TWEETS')
 
 
 def get_tweets_tweepy(user_obj, aws_conn):
@@ -368,11 +368,11 @@ def get_tweets_tweepy(user_obj, aws_conn):
         prediction = clf.predict(vectorized_text)[0]
         print('PREDICTED ' + prediction)
 
-    with aws_lock:
-        aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
+
+    aws_conn.write_twitter_user(user_obj.screen_name, user_obj.id, user_obj.id_str, prediction, user_obj.location)
     print('WROTE NEW USER')
 
-    with aws_lock:
-        aws_conn.write_tweets_status(tweets)
-    print('WROTE TWEETS')
+    
+    # aws_conn.write_tweets_status(tweets)
+    # print('WROTE TWEETS')
 
