@@ -94,7 +94,6 @@ def get_searched_users(app_user_email):
     # print('----------', 'entered get_searched_users', '----------')
     searched_users = []
     if app_user_email in running_user_tasks:
-        print('RUNNING USER TASK', running_user_tasks)
         for task in running_user_tasks[app_user_email]:
             searched_users.append((task[0], None, str(task[1]), None, None, 'Pending...'))
     with aws_lock:
