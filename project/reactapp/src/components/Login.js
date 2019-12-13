@@ -24,7 +24,7 @@ class Login extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     const loginInfo = {
-      email: this.state.email,
+	email: this.state.email.toLowerCase(),
       password: this.state.password
     }
 
