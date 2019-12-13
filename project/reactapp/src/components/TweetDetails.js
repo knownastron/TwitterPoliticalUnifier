@@ -135,64 +135,65 @@ class TweetDetails extends React.Component {
     return (
       <div className="component-main-div">
 
-        <h1>Tweet Details for:</h1>
-          <div className='center-single'>
-            <TwitterTweetEmbed tweetId={this.props.match.params.id}/>
-          </div>
-          <div className='center-single'>
-            <table className="tweet-detail-table">
-                <tbody>
-                  <tr>
-                    <th className='user-th'>Username</th>
-                    <th className='user-th'>Location</th>
-                    <th className='user-th'>Political Prediction</th>
-                  </tr>
-                  {
-                    this.state.users.map((user) => (
-                      <SearchedUserItem key={user.id} user={user} />
-                    ))
-                  }
-              </tbody>
-            </table>
-          </div>
-          <div className='center-single'>
-            <Map className="map" center={position} zoom={this.state.zoom}>
-              <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'/>
-              {
-                this.state.userInfoWithGeo.map((curUser, i) => {
-                  if (!curUser.coordinates.error) {
-                    switch(curUser.polLabel) {
-                      case 'conservative':
-                        return <Marker key={i} icon={gop} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
-                                {// <Popup>
-                                //   <img src='threelinebutton.png'></img>
-                                // </Popup>
-                                }
-                              </Marker>
-                      case 'liberal':
-                        return <Marker key={i} icon={dem} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
-                                {// <Popup>
-                                //   <img src='threelinebutton.png'></img>
-                                // </Popup>
-                                }
-                              </Marker>
-                      default:
-                        return <Marker key={i} icon={na} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
-                                {// <Popup>
-                                //   <img src='threelinebutton.png'></img>
-                                // </Popup>
-                                }
-                              </Marker>
-                    }
-                } else {
-                  return null;
+
+        <h1>Tweet Details</h1>
+        <div className="tweet-embed">
+          <TwitterTweetEmbed tweetId={this.props.match.params.id}/>
+        </div>
+        <div className='center-single'>
+          <table className="tweet-detail-table">
+              <tbody>
+                <tr>
+                  <th className='user-th'>Username</th>
+                  <th className='user-th'>Location</th>
+                  <th className='user-th'>Political Prediction</th>
+                </tr>
+                {
+                  this.state.users.map((user) => (
+                    <SearchedUserItem key={user.id} user={user} />
+                  ))
                 }
-              })
+            </tbody>
+          </table>
+        </div>
+        <div className='center-single'>
+          <Map className="map" center={position} zoom={this.state.zoom}>
+            <TileLayer
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'/>
+            {
+              this.state.userInfoWithGeo.map((curUser, i) => {
+                if (!curUser.coordinates.error) {
+                  switch(curUser.polLabel) {
+                    case 'conservative':
+                      return <Marker key={i} icon={gop} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
+                              {// <Popup>
+                              //   <img src='threelinebutton.png'></img>
+                              // </Popup>
+                              }
+                            </Marker>
+                    case 'liberal':
+                      return <Marker key={i} icon={dem} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
+                              {// <Popup>
+                              //   <img src='threelinebutton.png'></img>
+                              // </Popup>
+                              }
+                            </Marker>
+                    default:
+                      return <Marker key={i} icon={na} position={[curUser.coordinates.lat, curUser.coordinates.lng]}>
+                              {// <Popup>
+                              //   <img src='threelinebutton.png'></img>
+                              // </Popup>
+                              }
+                            </Marker>
+                  }
+              } else {
+                return null;
               }
-            </Map>
-          </div>
+            })
+            }
+          </Map>
+        </div>
       </div>
     )
   }
