@@ -31,7 +31,7 @@ class Test extends React.Component {
     const position = [this.state.lat, this.state.lng];
     return (
       <div>
-        <table className=main-table>
+        <table className="main-table">
             <tbody>
               <tr>
                 <th className='user-th'>Username</th>

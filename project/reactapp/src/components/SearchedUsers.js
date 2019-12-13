@@ -30,7 +30,7 @@ class SearchedUsers extends React.Component {
       <div className="component-main-div">
         <h2> Searched Users History </h2>
         <div className='center-single'>
-          <table className=main-table>
+          <table className="main-table">
               <tbody>
                 <tr>
                   <th className='user-th'>Username</th>
