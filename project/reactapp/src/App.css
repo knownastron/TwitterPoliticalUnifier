@@ -19,7 +19,10 @@
 .center-single {
   display: flex;
   justify-content: center;
+  overflow: auto;
 }
+
+
 
 .landing-page-div {
   background-image: url('./images/landingpageimage.png');
@@ -55,10 +58,11 @@
 
 .user-table {
   margin-top: 30px;
-  border: 1px solid black;
+  /* border: 1px solid black; */
   width: 90%;
   border-collapse: collapse;
   background-color: white;
+  overflow: auto;
 }
 
 .user-th {
@@ -70,7 +74,7 @@
   font-family: SFDisplay;
   border: 1px solid #E0E0E0;
   text-align: center;
-  padding: 10px;
+  padding: 5px;
 }
 
 .tweet-details-div {
@@ -91,8 +95,12 @@
 }
 
 .tweet-embed {
-  margin-top: 100px;
-  /* display: inline-block; */
+  text-align:center;
+  width: 100%;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  /* display: block; */
   /* float: left; */
 }
 
@@ -106,8 +114,6 @@
   margin-bottom: 10px;
   float: left;
 }
-
-
 
 button.link {
   background: none;
@@ -150,6 +156,7 @@ button.link {
 @media only screen and (max-width: 800px) {
   .user-table {
     width: 100%;
+    overflow: auto;
   }
 
   .component-half-div {
@@ -161,10 +168,23 @@ button.link {
     width: 100%;
   }
 
+  .map {
+    width: 100%;
+  }
+
   .component-main-div {
     padding-top: 5%;
     padding-bottom: 5%;
     padding-left: 1%;
     padding-right: 1%;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .tweet-embed {
+    text-align:center;
+    width: 80%;
+    display: block;
+
   }
 }
