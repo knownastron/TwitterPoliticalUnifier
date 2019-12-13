@@ -14,7 +14,6 @@ class Header extends React.Component {
   };
 
   onLogout = (e) => {
-    console.log(this.props.isAuthenticated);
     this.props.logoutUser();
   }
 

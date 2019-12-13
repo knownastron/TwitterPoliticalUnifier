@@ -36,7 +36,7 @@ class SearchedTweets extends React.Component {
       <div className="component-main-div">
         <h2> Searched Tweet History </h2>
         <div className='center-single'>
-          <table className="user-table">
+          <table className=main-table>
               <tbody>
                 <tr>
                   <th className='user-th'>Author</th>

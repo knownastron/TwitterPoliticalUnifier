@@ -97,7 +97,6 @@ class TweetDetails extends React.Component {
       'email': this.props.email
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
 	  .then((response) => {
-	      console.log(response.data.tweetLikes);
 	      this.setState({users: response.data.tweetLikes})
 	  })
     .catch((error) => {

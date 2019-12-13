@@ -57,7 +57,8 @@ class Verify extends React.Component {
     }
     Auth.resendSignUp(this.state.email)
     .then(() => {
-      console.log('code resent successfully');})
+
+    })
     .catch(err => {
       console.log(err);
     });
@@ -71,7 +72,7 @@ class Verify extends React.Component {
 	email: this.state.email.toLowerCase(),
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
     .then((response) => {
-      // console.log(response)
+
     })
   }
 

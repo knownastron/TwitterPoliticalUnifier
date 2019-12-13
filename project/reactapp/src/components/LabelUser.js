@@ -31,7 +31,6 @@ class LabelUser extends React.Component {
     }), {headers: {'Content-Type': 'application/json;charset=UTF-8'}})
     .then((response) => {
       this.setState({redirectToDashboard: true})
-      console.log(response)
     })
     .catch(function (error) {
       console.log(error)

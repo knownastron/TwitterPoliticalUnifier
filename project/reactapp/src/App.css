@@ -22,12 +22,9 @@
   overflow: auto;
 }
 
-
-
 .landing-page-div {
   background-image: url('./images/landingpageimage.png');
   background-repeat: no-repeat;
-  /* background-size: contain; */
   background-size: cover;
 
 }
@@ -56,9 +53,8 @@
   /* background: rgba(0, 151, 19, 0.1);  */
 }
 
-.user-table {
+.main-table {
   margin-top: 30px;
-  /* border: 1px solid black; */
   width: 90%;
   border-collapse: collapse;
   background-color: white;
@@ -83,8 +79,7 @@
 
 .tweet-detail-table {
   margin-top: 30px;
-  border: 1px solid black;
-  width: 80%;
+  width: 90%;
   border-collapse: collapse;
   background-color: white;
 }
@@ -100,13 +95,10 @@
   margin: auto;
   display: flex;
   justify-content: center;
-  /* display: block; */
-  /* float: left; */
 }
 
 .component-main-div {
   background-color: #FAFAFA;
-  /* background-color: red; */
   padding: 5%;
   display: inline-block;
   width: 100%;
@@ -124,17 +116,6 @@ button.link {
   height: 100px;
   background-color: red;
 }
-
-/* .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-} */
 
 @font-face {
   font-family: "SFDisplay";
@@ -154,7 +135,7 @@ button.link {
 }
 
 @media only screen and (max-width: 800px) {
-  .user-table {
+  .main-table {
     width: 100%;
     overflow: auto;
   }

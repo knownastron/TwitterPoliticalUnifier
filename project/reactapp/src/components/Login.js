@@ -31,11 +31,6 @@ class Login extends React.Component {
     this.props.loginUser(loginInfo);
   }
 
-  ya = e => {
-    e.preventDefault();
-    console.log(this.props.isAuthenticated);
-  }
-
   newAccount = e => {
     e.preventDefault();
     this.setState({createNewUser: true})
