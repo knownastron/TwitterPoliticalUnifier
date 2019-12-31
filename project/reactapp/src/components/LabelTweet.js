@@ -16,9 +16,16 @@ class LabelTweet extends React.Component {
   }
 
   validateTweetUrl = (tweeturl) => {
+    let removedQueryString = this.state.tweeturl;
+    if (this.state.tweeturl.indexOf('?') !== -1) {
+      removedQueryString = this.state.tweeturl.substring(0, this.state.tweeturl.indexOf('?'));
+      this.setState({tweeturl: removedQueryString});
+    }
+
     // must have twitter.com, username, status, and a number
     var isnum = /^\d+$/;
-    let splitUrl = this.state.tweeturl.split('/')
+    let splitUrl = removedQueryString.split('/')
+    console.log(splitUrl)
     if (splitUrl[0] === 'https:' &&
       splitUrl[2] === 'twitter.com' &&
       splitUrl[4] === 'status' && isnum.test(splitUrl[5])) {
@@ -36,6 +43,7 @@ class LabelTweet extends React.Component {
     }
     if (!this.validateTweetUrl(this.state.tweeturl)) {
       alert('Invalid tweet url');
+      return;
     }
 
     const url = 'https://www.knownastron.com:6001/api/3.0/labeltweet';
