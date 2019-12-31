@@ -55,7 +55,7 @@ def lambda_handler(event, context):
     if not public_key.verify(message.encode("utf8"), decoded_signature):
         print('Signature verification failed')
         return False
-    print('Signature successfully verified')
+    # print('Signature successfully verified')
     # since we passed the verification, we can now safely
     # use the unverified claims
     claims = jwt.get_unverified_claims(token)
@@ -68,7 +68,7 @@ def lambda_handler(event, context):
         print('Token was not issued for this audience')
         return False
     # now we can use the claims
-    print('Claim results:', claims)
+    # print('Claim results:', claims)
     return claims
 
 
