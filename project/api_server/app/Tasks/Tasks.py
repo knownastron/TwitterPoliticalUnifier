@@ -202,14 +202,18 @@ def predict_user_tweepy(screen_name, app_user_email):
     aws_conn = SQLConnection.AWSConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+    add_to_existing = False
     with label_user_task_lock:
         if app_user_email in running_user_tasks:
             for (cur_screen_name, cur_time) in running_user_tasks[app_user_email]:
                 if cur_screen_name == screen_name:
                     return {'status': 'already in progress'}
-            add_label_user_task_to_queue(app_user_email, screen_name, time_of_search)
+            add_to_existing = True
         else:
             running_user_tasks[app_user_email] = [(screen_name, time_of_search)]
+
+    if add_to_existing:
+        add_label_user_task_to_queue(app_user_email, screen_name, time_of_search)
 
     try:
         cur_user = aws_conn.get_twitter_user(screen_name)
