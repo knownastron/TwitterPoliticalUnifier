@@ -247,16 +247,20 @@ def predict_tweet_tweepy(app_user_email, tweet_id):
     print('GOT STATUS', status)
 
     # if tweet search already in progress
+    add_to_existing = False
     with label_tweet_task_lock:
         if app_user_email in running_tweet_tasks:
             for (cur_screen_name, cur_tweet_id, cur_text, cur_time) in running_tweet_tasks[app_user_email]:
                 if cur_tweet_id == status['id']:
                     return {'status': 'already in progress'}
-            add_tweet_to_running_tasks(app_user_email, status['screen_name'], status['id'], status['text'],
-                                       time_of_search)
+            add_to_existing = True
         else:
             running_tweet_tasks[app_user_email] = [
                 (status['screen_name'], status['id'], status['text'], time_of_search)]
+
+    if add_to_existing:
+        add_tweet_to_running_tasks(app_user_email, status['screen_name'], status['id'], status['text'],
+                                   time_of_search)
 
     try:
         # checks if tweet has already been searched and predicted before
