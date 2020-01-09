@@ -38,7 +38,6 @@ error_delay_seconds = 10
 max_tweets = 200
 twit_scraper = TwitterScraper.TwitterSearchImpl(rate_delay_seconds, error_delay_seconds, max_tweets)
 
-twit_conn = TwitterConnection.TwitterConnection()
 
 # set up NLP and vectorizer
 nlp_model = open('./NLP_political_classifier.pkl', 'rb')
@@ -120,6 +119,7 @@ def get_tweet_likes(tweet_id):
 
 @celery.task()
 def predict_user(screen_name, app_user_email):
+    twit_conn = TwitterConnection.TwitterConnection()
     aws_conn = SQLConnection.AWSConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -154,6 +154,7 @@ def predict_user(screen_name, app_user_email):
 @celery.task()
 def predict_tweet(app_user_email, tweet_id):
     aws_conn = SQLConnection.AWSConnection()
+    twit_conn = TwitterConnection.TwitterConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # from this point on use status
@@ -199,6 +200,7 @@ def predict_tweet(app_user_email, tweet_id):
 
 @celery.task()
 def predict_user_tweepy(screen_name, app_user_email):
+    twit_conn = TwitterConnection.TwitterConnection()
     aws_conn = SQLConnection.AWSConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -232,6 +234,7 @@ def predict_user_tweepy(screen_name, app_user_email):
 
 @celery.task()
 def predict_tweet_tweepy(app_user_email, tweet_id):
+    twit_conn = TwitterConnection.TwitterConnection()
     aws_conn = SQLConnection.AWSConnection()
     time_of_search = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -352,7 +355,7 @@ def get_tweets(user_obj, aws_conn):
 
 def get_tweets_tweepy(user_obj, aws_conn):
     print('Searching for: ' + user_obj.screen_name)
-
+    twit_conn = TwitterConnection.TwitterConnection()
     tweets = twit_conn.get_tweets(user_obj.screen_name)
     raw_tweets = [tweet.text for tweet in tweets]
     tweets_joined = ' '.join(raw_tweets)
