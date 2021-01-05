@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "aws-amplify": "^1.2.3",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "geocodio": "^2.0.0",
     "leaflet": "^1.6.0",
     "react": "^16.10.2",
